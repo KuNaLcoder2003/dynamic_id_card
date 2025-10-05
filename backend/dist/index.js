@@ -178,6 +178,59 @@ app.post('/createDynamicId/:token', async (req, res) => {
         });
     }
 });
+app.post('/verify/:dynamicId', async (req, res) => {
+    try {
+        const uuid = req.params.dynamicId;
+        if (!uuid) {
+            res.status(401).json({
+                message: 'Not verified',
+                valid: false
+            });
+            return;
+        }
+        const verified = await prisma.dynamicId.findFirst({
+            where: {
+                dynamicId: uuid
+            }
+        });
+        if (!verified || !verified.user_id) {
+            res.status(401).json({
+                message: 'Not verified',
+                valid: false
+            });
+            return;
+        }
+        const user = await prisma.user.findFirst({
+            where: {
+                id: verified.user_id
+            }
+        });
+        if (!user) {
+            res.status(403).json({
+                message: 'User does not exists , not verified'
+            });
+            return;
+        }
+        res.status(200).json({
+            message: 'User verified',
+            userId: {
+                uuid: verified.dynamicId,
+                user_id: user.id,
+                name: `${user.first_name} ${user.last_name}`,
+                qrCode: verified.qrCode,
+                user_avatar: user.picture_url
+            },
+            valid: true
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: 'Something went wrong',
+            error: error,
+        });
+    }
+});
 app.listen(3000, () => {
     console.log('App started');
 });
