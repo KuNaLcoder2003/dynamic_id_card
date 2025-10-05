@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://neondb_owner:npg_AolW7ghHDjM2@ep-cold-truth-ad53bfvo-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+}
+
+model User {
+  id            Int        @id @unique @default(autoincrement())
+  first_name    String     @db.VarChar(200)
+  last_name     String     @db.VarChar(200)
+  aadhar_number String     @unique @db.VarChar(200)
+  picture_url   String     @db.VarChar(200)
+  token         String     @default("") @db.VarChar(200)
+  dynamicIds    DynamicId?
+}
+
+model DynamicId {
+  id        Int    @id @unique @default(autoincrement())
+  dynamicId String @unique @db.VarChar(200)
+  user_id   Int    @unique
+  userId    User   @relation(fields: [user_id], references: [id])
+  qrCode    String @default("")
+}
