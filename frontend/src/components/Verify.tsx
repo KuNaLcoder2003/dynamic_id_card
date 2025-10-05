@@ -1,38 +1,61 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-}
+
 
 const Verify: React.FC = () => {
     const path = useLocation()
-    const [user, setUser] = useState<User | null>(null);
-    const [verified, setVerified] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const userId = path.pathname.split('/').at(-1)
+    const [loading, setLoading] = useState<boolean>(false);
+    const [verified, setVerified] = useState<boolean>(false)
 
-
-    useEffect(() => {
-        const user_id = path.pathname.split('/').at(-1)
-        if (user_id) {
-            setLoading(true);
-
-            setTimeout(() => {
-                setUser({
-                    id: user_id,
-                    name: "John Doe",
-                    email: "john.doe@example.com",
-                });
-                setLoading(false);
-            }, 1000);
-        }
-    }, []);
+    const [id, setId] = useState<IdCard>({
+        uuid: '',
+        user_id: 0,
+        name: '',
+        qrCode: '',
+        user_avatar: ''
+    })
+    interface IdCard {
+        uuid: string,
+        user_id: number,
+        name: string,
+        qrCode: string,
+        user_avatar: string
+    }
 
     const handleVerify = () => {
 
-        setVerified(true);
+        const user_id = path.pathname.split('/').at(-1)
+        setLoading(true)
+        try {
+            if (!user_id) {
+                toast.error('Bad request')
+                return
+            }
+            fetch('http://kunal_test.kunalserver.live/verify/' + user_id, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then(async (res: Response) => {
+                const data = await res.json()
+                if (data.valid) {
+                    toast.success(data.message)
+                    setId(data.userId)
+                    setLoading(false)
+                    setVerified(true)
+
+                } else {
+                    toast.error(data.message)
+                    setLoading(false)
+                }
+            })
+        } catch (error) {
+            toast.error('Somethig went wrong')
+            setLoading(false)
+        }
     };
 
     return (
@@ -48,38 +71,42 @@ const Verify: React.FC = () => {
             <h1 className="text-3xl font-bold mb-4">Verify User</h1>
 
 
-            {loading ? (
-                <p>Loading user details...</p>
-            ) : user ? (
-                <div className="bg-white shadow-md rounded p-6 w-full max-w-md text-center">
-                    <p className="mb-4">
-                        <span className="font-semibold">User ID:</span> {user.id}
-                    </p>
 
-                    {!verified ? (
-                        <button
-                            onClick={handleVerify}
-                            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
-                        >
-                            Verify User
-                        </button>
-                    ) : (
-                        <div className="mt-4">
-                            <p className="text-green-600 font-semibold mb-2">Verified!</p>
-                            <div className="text-left">
-                                <p>
-                                    <span className="font-semibold">Name:</span> {user.name}
-                                </p>
-                                <p>
-                                    <span className="font-semibold">Email:</span> {user.email}
-                                </p>
+
+
+            <div className="bg-white shadow-md rounded p-6 w-full max-w-md text-center">
+                <p className="mb-4">
+                    <span className="font-semibold">User ID:</span> {userId}
+                </p>
+
+                {!verified ? (
+                    <button
+                        onClick={handleVerify}
+                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+                    >
+                        Verify User
+                    </button>
+                ) : (
+                    <>
+                        {
+                            loading ? <p>Loading...</p> : <div className="mt-4">
+                                <p className="text-green-600 font-semibold mb-2">Verified!</p>
+                                <div className="text-left">
+                                    <p>
+                                        <span className="font-semibold">Name:</span> {id.name}
+                                    </p>
+                                    <p>
+                                        <span className="font-semibold">Code:</span> {id.uuid}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
-            ) : (
-                <p>User not found</p>
-            )}
+                        }
+                    </>
+                )}
+            </div>
+            : (
+            <p>User not found</p>
+            )
         </div>
     );
 };
