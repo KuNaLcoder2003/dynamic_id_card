@@ -15,7 +15,7 @@ const GenerateId: React.FC = () => {
         try {
             setGenerating(true)
             const id = path.pathname.split('/').at(-1)
-            fetch('http://localhost:3000/createDynamicId/' + id, {
+            fetch('http://kunal_test.kunalserver.live/createDynamicId/' + id, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

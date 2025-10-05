@@ -1,4 +1,4 @@
-import { Building2, Loader } from "lucide-react"
+import { Loader } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import toast from "react-hot-toast"
 import { useLocation } from "react-router-dom"
@@ -43,7 +43,7 @@ const Card: React.FC = () => {
         try {
             setLoading(true)
             const id = path.pathname.split('/').at(-1)
-            fetch('http://localhost:3000/card/' + `${id}`, {
+            fetch('http://kunal_test.kunalserver.live/card/' + `${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
