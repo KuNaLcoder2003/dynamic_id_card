@@ -27,9 +27,9 @@ function generateTokens(id) {
 const VERIFICATION_URL = 'https://dynamic-id-card.vercel.app/verify';
 app.post('/signup', upload.single('avatar'), async (req, res) => {
     try {
-        const { aadhar_number, first_name, last_name } = req.body;
+        const { aadhar_number, first_name, last_name, bank_code, branch_code } = req.body;
         const file = req.file;
-        if (!aadhar_number || !first_name || !last_name || !file) {
+        if (!aadhar_number || !first_name || !last_name || !file || !bank_code || !branch_code) {
             res.status(400).json({
                 message: 'Incomplete details'
             });
@@ -58,7 +58,9 @@ app.post('/signup', upload.single('avatar'), async (req, res) => {
                 last_name: last_name,
                 aadhar_number: aadhar_number,
                 picture_url: result.url,
-                token: hash
+                token: hash,
+                bankId: bank_code,
+                branchId: branch_code
             }
         });
         if (!new_user) {
@@ -107,13 +109,54 @@ app.post('/card/:dynamicId', async (req, res) => {
             });
             return;
         }
+        const bank = await fetch('https://sugee.io/KYCServiceAPI/kycapi/getBanks', {
+            method: 'POST',
+        });
+        const banks = await bank.json();
+        if (banks.status == -1) {
+            res.status(400).json({
+                message: 'Unable to fetch banks'
+            });
+            return;
+        }
+        const bank_name = banks.data.filter((obj) => obj.bank_code == user.bankId);
+        if (!bank_name) {
+            res.status(403).json({
+                message: 'Cannot get bank name , mapped to id :' + dymnaicId.dynamicId,
+                valid: false
+            });
+            return;
+        }
+        const formData = new FormData();
+        formData.append('bank_code', user.bankId);
+        const branch = await fetch('https://sugee.io/KYCServiceAPI/kycapi/getBranches', {
+            method: 'POST',
+            body: formData
+        });
+        const branches = await branch.json();
+        if (branches.status == '-1') {
+            res.status(400).json({
+                message: 'Unable to fetch branches'
+            });
+            return;
+        }
+        const branch_name = await branches.data.filter((obj) => obj.branch_code == user.branchId);
+        if (!bank_name) {
+            res.status(403).json({
+                message: 'Cannot get branch name , mapped to id :' + dymnaicId.dynamicId,
+                valid: false
+            });
+            return;
+        }
         res.status(200).json({
             userId: {
                 uuid: dymnaicId.dynamicId,
                 user_id: user.id,
                 name: `${user.first_name} ${user.last_name}`,
                 qrCode: dymnaicId.qrCode,
-                user_avatar: user.picture_url
+                user_avatar: user.picture_url,
+                bank_name: bank_name,
+                branch_name: branch_name
             },
             valid: true
         });
@@ -211,6 +254,45 @@ app.post('/verify/:dynamicId', async (req, res) => {
             });
             return;
         }
+        const bank = await fetch('https://sugee.io/KYCServiceAPI/kycapi/getBanks', {
+            method: 'POST',
+        });
+        const banks = await bank.json();
+        if (banks.status == -1) {
+            res.status(400).json({
+                message: 'Unable to fetch banks'
+            });
+            return;
+        }
+        const bank_name = banks.data.filter((obj) => obj.bank_code == user.bankId);
+        if (!bank_name) {
+            res.status(403).json({
+                message: 'Cannot get bank name , mapped to id :' + verified.dynamicId,
+                valid: false
+            });
+            return;
+        }
+        const formData = new FormData();
+        formData.append('bank_code', user.bankId);
+        const branch = await fetch('https://sugee.io/KYCServiceAPI/kycapi/getBranches', {
+            method: 'POST',
+            body: formData
+        });
+        const branches = await branch.json();
+        if (branches.status == '-1') {
+            res.status(400).json({
+                message: 'Unable to fetch branches'
+            });
+            return;
+        }
+        const branch_name = await branches.data.filter((obj) => obj.branch_code == user.branchId);
+        if (!bank_name) {
+            res.status(403).json({
+                message: 'Cannot get branch name , mapped to id :' + verified.dynamicId,
+                valid: false
+            });
+            return;
+        }
         res.status(200).json({
             message: 'User verified',
             userId: {
@@ -218,7 +300,9 @@ app.post('/verify/:dynamicId', async (req, res) => {
                 user_id: user.id,
                 name: `${user.first_name} ${user.last_name}`,
                 qrCode: verified.qrCode,
-                user_avatar: user.picture_url
+                user_avatar: user.picture_url,
+                bank_name: bank_name,
+                branch_name: branch_name
             },
             valid: true
         });
