@@ -1,9 +1,12 @@
+
+import { Loader } from "lucide-react";
 import type React from "react"
 import { useState, type FormEvent } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const SignUpForm: React.FC = () => {
+    const [loading, setLoading] = useState<boolean>(false)
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
     const [aadhar, setAadhar] = useState<string>("")
@@ -22,6 +25,7 @@ const SignUpForm: React.FC = () => {
         formData.append("last_name", lastName);
         formData.append("aadhar_number", aadhar)
         formData.append("avatar", photo[0]);
+        setLoading(true)
 
         try {
             fetch('https://kunal-test.kunalserver.live/signup', {
@@ -32,25 +36,39 @@ const SignUpForm: React.FC = () => {
                 if (data.valid) {
                     if (data.token) {
                         toast.success('Redirecting...')
+                        setLoading(false)
                         setTimeout(() => {
                             navigate(`/generate/${data.token}`)
                         }, 1000)
                     }
                     else {
-
+                        setLoading(false)
+                        toast.error('Error signing up')
                     }
 
                 }
             })
         } catch (error) {
             console.log(error)
+            setLoading(false)
         }
     };
     return (
-        <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
+        <div className="flex flex-col items-center p-6 bg-gray-100 min-h-screen relative">
             <Toaster />
             <img src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg" alt="Company Logo" className="w-32 mb-6" />
 
+            {
+                loading && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                        <div className='rounded-lg shadow-md h-auto p-4 w-[30%] m-auto'>
+                            <div className="flex flex-col justify-center items-center p-4 bg-white w-full gap-4 rounded-lg">
+                                <Loader />
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
 
             <form
                 onSubmit={handleSubmit}
