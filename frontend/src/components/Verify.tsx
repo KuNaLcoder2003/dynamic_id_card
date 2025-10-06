@@ -33,7 +33,7 @@ const Verify: React.FC = () => {
 
         try {
             const res = await fetch(
-                `https://kunal_test.kunalserver.live/verify/${userId}`,
+                `https://kunal-test.kunalserver.live/verify/${userId}`,
                 {
                     method: "POST",
                     headers: {
