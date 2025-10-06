@@ -137,7 +137,7 @@ const SignUpForm: React.FC = () => {
                 <input
                     type="text"
                     placeholder="Bank Code"
-                    value={lastName}
+                    value={bank_code}
                     onChange={(e) => set_bank_code(e.target.value)}
                     className="border p-2 rounded"
                     required
