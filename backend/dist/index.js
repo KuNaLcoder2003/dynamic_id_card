@@ -24,7 +24,7 @@ function toHash(string) {
 }
 function generateTokens(id) {
 }
-const VERIFICATION_URL = 'http://localhost:5173/verify';
+const VERIFICATION_URL = 'https://dynamic-id-card.vercel.app/verify';
 app.post('/signup', upload.single('avatar'), async (req, res) => {
     try {
         const { aadhar_number, first_name, last_name } = req.body;

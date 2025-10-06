@@ -30,7 +30,7 @@ function generateTokens(id: string) {
 
 }
 
-const VERIFICATION_URL = 'http://localhost:5173/verify'
+const VERIFICATION_URL = 'https://dynamic-id-card.vercel.app/verify'
 
 app.post('/signup', upload.single('avatar'), async (req: express.Request, res: express.Response) => {
     try {
