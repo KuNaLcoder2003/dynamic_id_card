@@ -126,7 +126,9 @@ exports.Prisma.UserScalarFieldEnum = {
   last_name: 'last_name',
   aadhar_number: 'aadhar_number',
   picture_url: 'picture_url',
-  token: 'token'
+  token: 'token',
+  bankId: 'bankId',
+  branchId: 'branchId'
 };
 
 exports.Prisma.DynamicIdScalarFieldEnum = {

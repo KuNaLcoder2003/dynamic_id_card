@@ -1,6 +1,6 @@
 import { Loader } from "lucide-react";
 import type React from "react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -10,16 +10,39 @@ const SignUpForm: React.FC = () => {
     const [lastName, setLastName] = useState<string>("");
     const [aadhar, setAadhar] = useState<string>("");
     const [photo, setPhoto] = useState<File[]>([]);
+    const [bank_code, set_bank_code] = useState<string>("")
+    const [branches, setBranches] = useState<any[]>([])
+    const [selectedBranch, setSelectedBranch] = useState<string>("")
     const navigate = useNavigate();
 
     const handlePhotoChange = (e: any) => {
         setPhoto(e.target.files);
     };
 
+    useEffect(() => {
+        try {
+            const formData = new FormData()
+            formData.append("bank_code", bank_code)
+            fetch('https://sugee.io/KYCServiceAPI/kycapi/getBranches', {
+                method: 'POST',
+                body: formData
+            }).then(async (res: Response) => {
+                const data = await res.json()
+                if (data.status == '1') {
+                    setBranches(data.data)
+                } else {
+                    toast.error(data.message)
+                }
+            })
+        } catch (error) {
+            toast.error('Something went wrong')
+        }
+    }, [bank_code])
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        // Validate Aadhar format: xxxx xxxx xxxx
+
         const aadharRegex = /^(\d{4} \d{4} \d{4})$/;
         if (!aadharRegex.test(aadhar)) {
             toast.error("Aadhar must be in xxxx xxxx xxxx format");
@@ -31,6 +54,8 @@ const SignUpForm: React.FC = () => {
         formData.append("last_name", lastName);
         formData.append("aadhar_number", aadhar);
         formData.append("avatar", photo[0]);
+        formData.append("bank_code", bank_code);
+        formData.append("branch_code", selectedBranch)
         setLoading(true);
 
         try {
@@ -98,17 +123,39 @@ const SignUpForm: React.FC = () => {
                     placeholder="Aadhar (xxxx xxxx xxxx)"
                     value={aadhar}
                     onChange={(e) => {
-                        // Remove all non-digit characters
+
                         let value = e.target.value.replace(/\D/g, '');
-                        // Limit to 12 digits
+
                         value = value.slice(0, 12);
-                        // Add spaces after every 4 digits
+
                         const formatted = value.replace(/(\d{4})(?=\d)/g, '$1 ');
                         setAadhar(formatted);
                     }}
                     className="border p-2 rounded"
                     required
                 />
+                <input
+                    type="text"
+                    placeholder="Bank Code"
+                    value={lastName}
+                    onChange={(e) => set_bank_code(e.target.value)}
+                    className="border p-2 rounded"
+                    required
+                />
+                <select
+                    onChange={(e) => setSelectedBranch(e.target.value)}
+                    required
+                    className="border p-2 rounded"
+                >
+                    <option value="Select Branch">Select Branch</option>
+                    {
+                        branches.map((obj: any) => {
+                            return (
+                                <option value={obj.branch_code}>{obj.branch_name}</option>
+                            )
+                        })
+                    }
+                </select>
                 <input
                     type="file"
                     accept="image/*"

@@ -21,6 +21,8 @@ model User {
   aadhar_number String @db.VarChar(200) @unique
   picture_url String @db.VarChar(200) 
   token String @db.VarChar(200) @default("")
+  bankId String @db.VarChar(200) @default("162") 
+  branchId String @db.VarChar(200) @default("")
   dynamicIds DynamicId?
 }
 

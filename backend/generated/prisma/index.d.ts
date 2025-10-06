@@ -978,6 +978,8 @@ export namespace Prisma {
     aadhar_number: string | null
     picture_url: string | null
     token: string | null
+    bankId: string | null
+    branchId: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -987,6 +989,8 @@ export namespace Prisma {
     aadhar_number: string | null
     picture_url: string | null
     token: string | null
+    bankId: string | null
+    branchId: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -996,6 +1000,8 @@ export namespace Prisma {
     aadhar_number: number
     picture_url: number
     token: number
+    bankId: number
+    branchId: number
     _all: number
   }
 
@@ -1015,6 +1021,8 @@ export namespace Prisma {
     aadhar_number?: true
     picture_url?: true
     token?: true
+    bankId?: true
+    branchId?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1024,6 +1032,8 @@ export namespace Prisma {
     aadhar_number?: true
     picture_url?: true
     token?: true
+    bankId?: true
+    branchId?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1033,6 +1043,8 @@ export namespace Prisma {
     aadhar_number?: true
     picture_url?: true
     token?: true
+    bankId?: true
+    branchId?: true
     _all?: true
   }
 
@@ -1129,6 +1141,8 @@ export namespace Prisma {
     aadhar_number: string
     picture_url: string
     token: string
+    bankId: string
+    branchId: string
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -1157,6 +1171,8 @@ export namespace Prisma {
     aadhar_number?: boolean
     picture_url?: boolean
     token?: boolean
+    bankId?: boolean
+    branchId?: boolean
     dynamicIds?: boolean | User$dynamicIdsArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1167,6 +1183,8 @@ export namespace Prisma {
     aadhar_number?: boolean
     picture_url?: boolean
     token?: boolean
+    bankId?: boolean
+    branchId?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1176,6 +1194,8 @@ export namespace Prisma {
     aadhar_number?: boolean
     picture_url?: boolean
     token?: boolean
+    bankId?: boolean
+    branchId?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1185,9 +1205,11 @@ export namespace Prisma {
     aadhar_number?: boolean
     picture_url?: boolean
     token?: boolean
+    bankId?: boolean
+    branchId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "first_name" | "last_name" | "aadhar_number" | "picture_url" | "token", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "first_name" | "last_name" | "aadhar_number" | "picture_url" | "token" | "bankId" | "branchId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     dynamicIds?: boolean | User$dynamicIdsArgs<ExtArgs>
   }
@@ -1206,6 +1228,8 @@ export namespace Prisma {
       aadhar_number: string
       picture_url: string
       token: string
+      bankId: string
+      branchId: string
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1636,6 +1660,8 @@ export namespace Prisma {
     readonly aadhar_number: FieldRef<"User", 'String'>
     readonly picture_url: FieldRef<"User", 'String'>
     readonly token: FieldRef<"User", 'String'>
+    readonly bankId: FieldRef<"User", 'String'>
+    readonly branchId: FieldRef<"User", 'String'>
   }
     
 
@@ -3164,7 +3190,9 @@ export namespace Prisma {
     last_name: 'last_name',
     aadhar_number: 'aadhar_number',
     picture_url: 'picture_url',
-    token: 'token'
+    token: 'token',
+    bankId: 'bankId',
+    branchId: 'branchId'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -3256,6 +3284,8 @@ export namespace Prisma {
     aadhar_number?: StringFilter<"User"> | string
     picture_url?: StringFilter<"User"> | string
     token?: StringFilter<"User"> | string
+    bankId?: StringFilter<"User"> | string
+    branchId?: StringFilter<"User"> | string
     dynamicIds?: XOR<DynamicIdNullableScalarRelationFilter, DynamicIdWhereInput> | null
   }
 
@@ -3266,6 +3296,8 @@ export namespace Prisma {
     aadhar_number?: SortOrder
     picture_url?: SortOrder
     token?: SortOrder
+    bankId?: SortOrder
+    branchId?: SortOrder
     dynamicIds?: DynamicIdOrderByWithRelationInput
   }
 
@@ -3279,6 +3311,8 @@ export namespace Prisma {
     last_name?: StringFilter<"User"> | string
     picture_url?: StringFilter<"User"> | string
     token?: StringFilter<"User"> | string
+    bankId?: StringFilter<"User"> | string
+    branchId?: StringFilter<"User"> | string
     dynamicIds?: XOR<DynamicIdNullableScalarRelationFilter, DynamicIdWhereInput> | null
   }, "id" | "id" | "aadhar_number">
 
@@ -3289,6 +3323,8 @@ export namespace Prisma {
     aadhar_number?: SortOrder
     picture_url?: SortOrder
     token?: SortOrder
+    bankId?: SortOrder
+    branchId?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -3306,6 +3342,8 @@ export namespace Prisma {
     aadhar_number?: StringWithAggregatesFilter<"User"> | string
     picture_url?: StringWithAggregatesFilter<"User"> | string
     token?: StringWithAggregatesFilter<"User"> | string
+    bankId?: StringWithAggregatesFilter<"User"> | string
+    branchId?: StringWithAggregatesFilter<"User"> | string
   }
 
   export type DynamicIdWhereInput = {
@@ -3366,6 +3404,8 @@ export namespace Prisma {
     aadhar_number: string
     picture_url: string
     token?: string
+    bankId?: string
+    branchId?: string
     dynamicIds?: DynamicIdCreateNestedOneWithoutUserIdInput
   }
 
@@ -3376,6 +3416,8 @@ export namespace Prisma {
     aadhar_number: string
     picture_url: string
     token?: string
+    bankId?: string
+    branchId?: string
     dynamicIds?: DynamicIdUncheckedCreateNestedOneWithoutUserIdInput
   }
 
@@ -3385,6 +3427,8 @@ export namespace Prisma {
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
+    bankId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
     dynamicIds?: DynamicIdUpdateOneWithoutUserIdNestedInput
   }
 
@@ -3395,6 +3439,8 @@ export namespace Prisma {
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
+    bankId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
     dynamicIds?: DynamicIdUncheckedUpdateOneWithoutUserIdNestedInput
   }
 
@@ -3405,6 +3451,8 @@ export namespace Prisma {
     aadhar_number: string
     picture_url: string
     token?: string
+    bankId?: string
+    branchId?: string
   }
 
   export type UserUpdateManyMutationInput = {
@@ -3413,6 +3461,8 @@ export namespace Prisma {
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
+    bankId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -3422,6 +3472,8 @@ export namespace Prisma {
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
+    bankId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
   }
 
   export type DynamicIdCreateInput = {
@@ -3507,6 +3559,8 @@ export namespace Prisma {
     aadhar_number?: SortOrder
     picture_url?: SortOrder
     token?: SortOrder
+    bankId?: SortOrder
+    branchId?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -3520,6 +3574,8 @@ export namespace Prisma {
     aadhar_number?: SortOrder
     picture_url?: SortOrder
     token?: SortOrder
+    bankId?: SortOrder
+    branchId?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -3529,6 +3585,8 @@ export namespace Prisma {
     aadhar_number?: SortOrder
     picture_url?: SortOrder
     token?: SortOrder
+    bankId?: SortOrder
+    branchId?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -3776,6 +3834,8 @@ export namespace Prisma {
     aadhar_number: string
     picture_url: string
     token?: string
+    bankId?: string
+    branchId?: string
   }
 
   export type UserUncheckedCreateWithoutDynamicIdsInput = {
@@ -3785,6 +3845,8 @@ export namespace Prisma {
     aadhar_number: string
     picture_url: string
     token?: string
+    bankId?: string
+    branchId?: string
   }
 
   export type UserCreateOrConnectWithoutDynamicIdsInput = {
@@ -3809,6 +3871,8 @@ export namespace Prisma {
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
+    bankId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUncheckedUpdateWithoutDynamicIdsInput = {
@@ -3818,6 +3882,8 @@ export namespace Prisma {
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
+    bankId?: StringFieldUpdateOperationsInput | string
+    branchId?: StringFieldUpdateOperationsInput | string
   }
 
 

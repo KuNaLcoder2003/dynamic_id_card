@@ -98,7 +98,9 @@ exports.Prisma.UserScalarFieldEnum = {
   last_name: 'last_name',
   aadhar_number: 'aadhar_number',
   picture_url: 'picture_url',
-  token: 'token'
+  token: 'token',
+  bankId: 'bankId',
+  branchId: 'branchId'
 };
 
 exports.Prisma.DynamicIdScalarFieldEnum = {
@@ -171,13 +173,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = \"postgresql://neondb_owner:npg_AolW7ghHDjM2@ep-cold-truth-ad53bfvo-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require\"\n}\n\nmodel User {\n  id            Int        @id @unique @default(autoincrement())\n  first_name    String     @db.VarChar(200)\n  last_name     String     @db.VarChar(200)\n  aadhar_number String     @unique @db.VarChar(200)\n  picture_url   String     @db.VarChar(200)\n  token         String     @default(\"\") @db.VarChar(200)\n  dynamicIds    DynamicId?\n}\n\nmodel DynamicId {\n  id        Int    @id @unique @default(autoincrement())\n  dynamicId String @unique @db.VarChar(200)\n  user_id   Int    @unique\n  userId    User   @relation(fields: [user_id], references: [id])\n  qrCode    String @default(\"\")\n}\n",
-  "inlineSchemaHash": "e7ff1714f211c1ccf69c928a80beb5cd5d7e2a7b5ff890b43b0dbbab720fa455",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = \"postgresql://neondb_owner:npg_AolW7ghHDjM2@ep-cold-truth-ad53bfvo-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require\"\n}\n\nmodel User {\n  id            Int        @id @unique @default(autoincrement())\n  first_name    String     @db.VarChar(200)\n  last_name     String     @db.VarChar(200)\n  aadhar_number String     @unique @db.VarChar(200)\n  picture_url   String     @db.VarChar(200)\n  token         String     @default(\"\") @db.VarChar(200)\n  bankId        String     @default(\"162\") @db.VarChar(200)\n  branchId      String     @default(\"\") @db.VarChar(200)\n  dynamicIds    DynamicId?\n}\n\nmodel DynamicId {\n  id        Int    @id @unique @default(autoincrement())\n  dynamicId String @unique @db.VarChar(200)\n  user_id   Int    @unique\n  userId    User   @relation(fields: [user_id], references: [id])\n  qrCode    String @default(\"\")\n}\n",
+  "inlineSchemaHash": "120671b1b6d1f3a5a5b038b395a4c435e9f622ccaa6714709f3ef9252554d1ab",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"first_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"last_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"aadhar_number\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"picture_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"dynamicIds\",\"kind\":\"object\",\"type\":\"DynamicId\",\"relationName\":\"DynamicIdToUser\"}],\"dbName\":null},\"DynamicId\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"dynamicId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"DynamicIdToUser\"},{\"name\":\"qrCode\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"first_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"last_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"aadhar_number\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"picture_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bankId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"branchId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"dynamicIds\",\"kind\":\"object\",\"type\":\"DynamicId\",\"relationName\":\"DynamicIdToUser\"}],\"dbName\":null},\"DynamicId\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"dynamicId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"userId\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"DynamicIdToUser\"},{\"name\":\"qrCode\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
