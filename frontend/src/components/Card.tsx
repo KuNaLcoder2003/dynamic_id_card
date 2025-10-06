@@ -43,7 +43,7 @@ const Card: React.FC = () => {
         try {
             setLoading(true)
             const id = path.pathname.split('/').at(-1)
-            fetch('http://kunal_test.kunalserver.live/card/' + `${id}`, {
+            fetch('https://kunal_test.kunalserver.live/card/' + `${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -24,7 +24,7 @@ const SignUpForm: React.FC = () => {
         formData.append("avatar", photo[0]);
 
         try {
-            fetch('http://kunal_test.kunalserver.live/signup', {
+            fetch('https://kunal_test.kunalserver.live/signup', {
                 method: 'POST',
                 body: formData
             }).then(async (res: Response) => {
