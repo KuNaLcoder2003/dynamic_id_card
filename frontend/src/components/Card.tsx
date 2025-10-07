@@ -156,6 +156,7 @@ const Card: React.FC = () => {
     const cardRef = useRef<HTMLDivElement>(null)
     const path = useLocation()
     const [loading, setLoading] = useState<boolean>(false)
+    const [permitted, setPermitted] = useState<boolean>(false)
     const [id, setId] = useState<IdCard>({
         uuid: "",
         user_id: 0,
@@ -165,6 +166,7 @@ const Card: React.FC = () => {
         bank_name: [],
         branch_name: [],
     })
+    const [message, setMessage] = useState<string>("")
 
     const downloadPDF = async () => {
         if (!cardRef.current) return
@@ -194,13 +196,18 @@ const Card: React.FC = () => {
                 const data = await res.json()
                 if (data.valid) {
                     setId(data.userId)
+                    setPermitted(true)
                 } else {
                     toast.error(data.message)
+                    setMessage(data.message)
+                    setPermitted(false)
+
                 }
             } catch (error) {
                 toast.error("Something went wrong")
             } finally {
                 setLoading(false)
+                setPermitted(false)
             }
         }
 
@@ -214,7 +221,7 @@ const Card: React.FC = () => {
                     <Loader className="animate-spin w-8 h-8 text-gray-700" />
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center mt-10">
+                permitted ? <div className="flex flex-col items-center justify-center mt-10">
                     <div
                         ref={cardRef}
                         className="w-[400px] h-[560px] rounded-xl shadow-lg bg-white flex flex-col items-center p-6 relative"
@@ -309,7 +316,7 @@ const Card: React.FC = () => {
                     >
                         Download as PDF
                     </button>
-                </div>
+                </div> : <p className="">{message}</p>
             )}
         </>
     )

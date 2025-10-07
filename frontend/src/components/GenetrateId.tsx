@@ -2,6 +2,7 @@
 import { LoaderCircle } from "lucide-react"
 import type React from "react"
 import { useState } from "react"
+import toast from "react-hot-toast"
 import { useLocation, useNavigate } from "react-router-dom"
 
 
@@ -23,11 +24,10 @@ const GenerateId: React.FC = () => {
             }).then(async (res: Response) => {
                 const data = await res.json()
                 if (data.valid) {
-
                     setGenerating(false)
                     navigate(`/card/${data.userId.uuid}`)
                 } else {
-                    alert(data.message)
+                    toast(data.message)
                     setGenerating(false)
                 }
             })
