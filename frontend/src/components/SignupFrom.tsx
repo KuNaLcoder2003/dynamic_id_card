@@ -13,6 +13,7 @@ const SignUpForm: React.FC = () => {
     const [bank_code, set_bank_code] = useState<string>("")
     const [branches, setBranches] = useState<any[]>([])
     const [selectedBranch, setSelectedBranch] = useState<string>("")
+    const [mobile, setMobile] = useState<string>("")
     const navigate = useNavigate();
 
     const handlePhotoChange = (e: any) => {
@@ -56,6 +57,7 @@ const SignUpForm: React.FC = () => {
         formData.append("avatar", photo[0]);
         formData.append("bank_code", bank_code);
         formData.append("branch_code", selectedBranch)
+        formData.append("mobile_number", mobile)
         setLoading(true);
 
         try {
@@ -115,6 +117,14 @@ const SignUpForm: React.FC = () => {
                     placeholder="Last Name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
+                    className="border p-2 rounded"
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Last Name"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
                     className="border p-2 rounded"
                     required
                 />
