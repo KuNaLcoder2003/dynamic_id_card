@@ -316,7 +316,10 @@ const Card: React.FC = () => {
                     >
                         Download as PDF
                     </button>
-                </div> : <p className="">{message}</p>
+                </div> : <div className="flex flex-col items-center justify-center gap-4 w-screen h-screen">
+                    <p>{message}</p>
+                    <p>After getting approval get your ID card at {`https://dynamic-id-card.vercel.app/card/${path.pathname.split("/").at(-1)}`}</p>
+                </div>
             )}
         </>
     )
