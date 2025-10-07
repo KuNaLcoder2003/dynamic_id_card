@@ -126,6 +126,7 @@ exports.Prisma.UserScalarFieldEnum = {
   last_name: 'last_name',
   aadhar_number: 'aadhar_number',
   picture_url: 'picture_url',
+  mobile_number: 'mobile_number',
   token: 'token',
   bankId: 'bankId',
   branchId: 'branchId'

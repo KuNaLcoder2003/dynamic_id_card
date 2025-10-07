@@ -977,6 +977,7 @@ export namespace Prisma {
     last_name: string | null
     aadhar_number: string | null
     picture_url: string | null
+    mobile_number: string | null
     token: string | null
     bankId: string | null
     branchId: string | null
@@ -988,6 +989,7 @@ export namespace Prisma {
     last_name: string | null
     aadhar_number: string | null
     picture_url: string | null
+    mobile_number: string | null
     token: string | null
     bankId: string | null
     branchId: string | null
@@ -999,6 +1001,7 @@ export namespace Prisma {
     last_name: number
     aadhar_number: number
     picture_url: number
+    mobile_number: number
     token: number
     bankId: number
     branchId: number
@@ -1020,6 +1023,7 @@ export namespace Prisma {
     last_name?: true
     aadhar_number?: true
     picture_url?: true
+    mobile_number?: true
     token?: true
     bankId?: true
     branchId?: true
@@ -1031,6 +1035,7 @@ export namespace Prisma {
     last_name?: true
     aadhar_number?: true
     picture_url?: true
+    mobile_number?: true
     token?: true
     bankId?: true
     branchId?: true
@@ -1042,6 +1047,7 @@ export namespace Prisma {
     last_name?: true
     aadhar_number?: true
     picture_url?: true
+    mobile_number?: true
     token?: true
     bankId?: true
     branchId?: true
@@ -1140,6 +1146,7 @@ export namespace Prisma {
     last_name: string
     aadhar_number: string
     picture_url: string
+    mobile_number: string
     token: string
     bankId: string
     branchId: string
@@ -1170,6 +1177,7 @@ export namespace Prisma {
     last_name?: boolean
     aadhar_number?: boolean
     picture_url?: boolean
+    mobile_number?: boolean
     token?: boolean
     bankId?: boolean
     branchId?: boolean
@@ -1182,6 +1190,7 @@ export namespace Prisma {
     last_name?: boolean
     aadhar_number?: boolean
     picture_url?: boolean
+    mobile_number?: boolean
     token?: boolean
     bankId?: boolean
     branchId?: boolean
@@ -1193,6 +1202,7 @@ export namespace Prisma {
     last_name?: boolean
     aadhar_number?: boolean
     picture_url?: boolean
+    mobile_number?: boolean
     token?: boolean
     bankId?: boolean
     branchId?: boolean
@@ -1204,12 +1214,13 @@ export namespace Prisma {
     last_name?: boolean
     aadhar_number?: boolean
     picture_url?: boolean
+    mobile_number?: boolean
     token?: boolean
     bankId?: boolean
     branchId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "first_name" | "last_name" | "aadhar_number" | "picture_url" | "token" | "bankId" | "branchId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "first_name" | "last_name" | "aadhar_number" | "picture_url" | "mobile_number" | "token" | "bankId" | "branchId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     dynamicIds?: boolean | User$dynamicIdsArgs<ExtArgs>
   }
@@ -1227,6 +1238,7 @@ export namespace Prisma {
       last_name: string
       aadhar_number: string
       picture_url: string
+      mobile_number: string
       token: string
       bankId: string
       branchId: string
@@ -1659,6 +1671,7 @@ export namespace Prisma {
     readonly last_name: FieldRef<"User", 'String'>
     readonly aadhar_number: FieldRef<"User", 'String'>
     readonly picture_url: FieldRef<"User", 'String'>
+    readonly mobile_number: FieldRef<"User", 'String'>
     readonly token: FieldRef<"User", 'String'>
     readonly bankId: FieldRef<"User", 'String'>
     readonly branchId: FieldRef<"User", 'String'>
@@ -3190,6 +3203,7 @@ export namespace Prisma {
     last_name: 'last_name',
     aadhar_number: 'aadhar_number',
     picture_url: 'picture_url',
+    mobile_number: 'mobile_number',
     token: 'token',
     bankId: 'bankId',
     branchId: 'branchId'
@@ -3283,6 +3297,7 @@ export namespace Prisma {
     last_name?: StringFilter<"User"> | string
     aadhar_number?: StringFilter<"User"> | string
     picture_url?: StringFilter<"User"> | string
+    mobile_number?: StringFilter<"User"> | string
     token?: StringFilter<"User"> | string
     bankId?: StringFilter<"User"> | string
     branchId?: StringFilter<"User"> | string
@@ -3295,6 +3310,7 @@ export namespace Prisma {
     last_name?: SortOrder
     aadhar_number?: SortOrder
     picture_url?: SortOrder
+    mobile_number?: SortOrder
     token?: SortOrder
     bankId?: SortOrder
     branchId?: SortOrder
@@ -3310,6 +3326,7 @@ export namespace Prisma {
     first_name?: StringFilter<"User"> | string
     last_name?: StringFilter<"User"> | string
     picture_url?: StringFilter<"User"> | string
+    mobile_number?: StringFilter<"User"> | string
     token?: StringFilter<"User"> | string
     bankId?: StringFilter<"User"> | string
     branchId?: StringFilter<"User"> | string
@@ -3322,6 +3339,7 @@ export namespace Prisma {
     last_name?: SortOrder
     aadhar_number?: SortOrder
     picture_url?: SortOrder
+    mobile_number?: SortOrder
     token?: SortOrder
     bankId?: SortOrder
     branchId?: SortOrder
@@ -3341,6 +3359,7 @@ export namespace Prisma {
     last_name?: StringWithAggregatesFilter<"User"> | string
     aadhar_number?: StringWithAggregatesFilter<"User"> | string
     picture_url?: StringWithAggregatesFilter<"User"> | string
+    mobile_number?: StringWithAggregatesFilter<"User"> | string
     token?: StringWithAggregatesFilter<"User"> | string
     bankId?: StringWithAggregatesFilter<"User"> | string
     branchId?: StringWithAggregatesFilter<"User"> | string
@@ -3403,6 +3422,7 @@ export namespace Prisma {
     last_name: string
     aadhar_number: string
     picture_url: string
+    mobile_number?: string
     token?: string
     bankId?: string
     branchId?: string
@@ -3415,6 +3435,7 @@ export namespace Prisma {
     last_name: string
     aadhar_number: string
     picture_url: string
+    mobile_number?: string
     token?: string
     bankId?: string
     branchId?: string
@@ -3426,6 +3447,7 @@ export namespace Prisma {
     last_name?: StringFieldUpdateOperationsInput | string
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
+    mobile_number?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     bankId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
@@ -3438,6 +3460,7 @@ export namespace Prisma {
     last_name?: StringFieldUpdateOperationsInput | string
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
+    mobile_number?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     bankId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
@@ -3450,6 +3473,7 @@ export namespace Prisma {
     last_name: string
     aadhar_number: string
     picture_url: string
+    mobile_number?: string
     token?: string
     bankId?: string
     branchId?: string
@@ -3460,6 +3484,7 @@ export namespace Prisma {
     last_name?: StringFieldUpdateOperationsInput | string
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
+    mobile_number?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     bankId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
@@ -3471,6 +3496,7 @@ export namespace Prisma {
     last_name?: StringFieldUpdateOperationsInput | string
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
+    mobile_number?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     bankId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
@@ -3558,6 +3584,7 @@ export namespace Prisma {
     last_name?: SortOrder
     aadhar_number?: SortOrder
     picture_url?: SortOrder
+    mobile_number?: SortOrder
     token?: SortOrder
     bankId?: SortOrder
     branchId?: SortOrder
@@ -3573,6 +3600,7 @@ export namespace Prisma {
     last_name?: SortOrder
     aadhar_number?: SortOrder
     picture_url?: SortOrder
+    mobile_number?: SortOrder
     token?: SortOrder
     bankId?: SortOrder
     branchId?: SortOrder
@@ -3584,6 +3612,7 @@ export namespace Prisma {
     last_name?: SortOrder
     aadhar_number?: SortOrder
     picture_url?: SortOrder
+    mobile_number?: SortOrder
     token?: SortOrder
     bankId?: SortOrder
     branchId?: SortOrder
@@ -3833,6 +3862,7 @@ export namespace Prisma {
     last_name: string
     aadhar_number: string
     picture_url: string
+    mobile_number?: string
     token?: string
     bankId?: string
     branchId?: string
@@ -3844,6 +3874,7 @@ export namespace Prisma {
     last_name: string
     aadhar_number: string
     picture_url: string
+    mobile_number?: string
     token?: string
     bankId?: string
     branchId?: string
@@ -3870,6 +3901,7 @@ export namespace Prisma {
     last_name?: StringFieldUpdateOperationsInput | string
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
+    mobile_number?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     bankId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string
@@ -3881,6 +3913,7 @@ export namespace Prisma {
     last_name?: StringFieldUpdateOperationsInput | string
     aadhar_number?: StringFieldUpdateOperationsInput | string
     picture_url?: StringFieldUpdateOperationsInput | string
+    mobile_number?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     bankId?: StringFieldUpdateOperationsInput | string
     branchId?: StringFieldUpdateOperationsInput | string

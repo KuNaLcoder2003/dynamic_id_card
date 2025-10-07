@@ -27,9 +27,9 @@ function generateTokens(id) {
 const VERIFICATION_URL = 'https://dynamic-id-card.vercel.app/verify';
 app.post('/signup', upload.single('avatar'), async (req, res) => {
     try {
-        const { aadhar_number, first_name, last_name, bank_code, branch_code } = req.body;
+        const { aadhar_number, first_name, last_name, bank_code, branch_code, mobile_number } = req.body;
         const file = req.file;
-        if (!aadhar_number || !first_name || !last_name || !file || !bank_code || !branch_code) {
+        if (!aadhar_number || !first_name || !last_name || !file || !bank_code || !branch_code || mobile_number) {
             res.status(400).json({
                 message: 'Incomplete details'
             });
@@ -60,7 +60,8 @@ app.post('/signup', upload.single('avatar'), async (req, res) => {
                 picture_url: result.url,
                 token: hash,
                 bankId: bank_code,
-                branchId: branch_code
+                branchId: branch_code,
+                mobile_number: mobile_number
             }
         });
         if (!new_user) {
@@ -106,6 +107,19 @@ app.post('/card/:dynamicId', async (req, res) => {
         if (!user) {
             res.status(404).json({
                 message: 'User Not Found'
+            });
+            return;
+        }
+        const form = new FormData();
+        form.append("UserID", `${user.mobile_number}`);
+        const registerd_user = await fetch('https://sugee.io/KYCServiceAPI/kycapi/getUserInfo', {
+            method: 'POST',
+            body: form
+        });
+        const response = await registerd_user.json();
+        if (response.data.active != '1') {
+            res.status(401).json({
+                message: 'You are not permitted by the admin yet'
             });
             return;
         }

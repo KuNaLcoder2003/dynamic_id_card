@@ -20,6 +20,7 @@ model User {
   last_name String @db.VarChar(200)
   aadhar_number String @db.VarChar(200) @unique
   picture_url String @db.VarChar(200) 
+  mobile_number String @db.VarChar(200) @default("")
   token String @db.VarChar(200) @default("")
   bankId String @db.VarChar(200) @default("162") 
   branchId String @db.VarChar(200) @default("")
@@ -33,3 +34,5 @@ model DynamicId {
   userId User @relation(fields: [user_id] , references: [id])
   qrCode String @default("")
 }
+
+

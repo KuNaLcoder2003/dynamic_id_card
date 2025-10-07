@@ -20,6 +20,7 @@ model User {
   last_name     String     @db.VarChar(200)
   aadhar_number String     @unique @db.VarChar(200)
   picture_url   String     @db.VarChar(200)
+  mobile_number String     @default("") @db.VarChar(200)
   token         String     @default("") @db.VarChar(200)
   bankId        String     @default("162") @db.VarChar(200)
   branchId      String     @default("") @db.VarChar(200)
