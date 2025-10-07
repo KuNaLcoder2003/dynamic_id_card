@@ -294,7 +294,7 @@ const Card: React.FC = () => {
                         </div>
 
 
-                        <div className="absolute bottom-6 right-4 w-24 h-24">
+                        <div className="absolute bottom-10 right-4 w-24 h-24">
                             <img
                                 src={id.qrCode}
                                 alt="QR Code"
