@@ -207,7 +207,7 @@ const Card: React.FC = () => {
                 toast.error("Something went wrong")
             } finally {
                 setLoading(false)
-                setPermitted(false)
+
             }
         }
 
