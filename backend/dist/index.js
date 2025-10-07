@@ -29,7 +29,7 @@ app.post('/signup', upload.single('avatar'), async (req, res) => {
     try {
         const { aadhar_number, first_name, last_name, bank_code, branch_code, mobile_number } = req.body;
         const file = req.file;
-        if (!aadhar_number || !first_name || !last_name || !file || !bank_code || !branch_code || mobile_number) {
+        if (!aadhar_number || !first_name || !last_name || !file || !bank_code || !branch_code || !mobile_number) {
             res.status(400).json({
                 message: 'Incomplete details'
             });
