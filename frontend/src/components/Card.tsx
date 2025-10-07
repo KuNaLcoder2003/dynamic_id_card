@@ -217,7 +217,7 @@ const Card: React.FC = () => {
                 <div className="flex flex-col items-center justify-center mt-10">
                     <div
                         ref={cardRef}
-                        className="w-[400px] h-[550px] rounded-xl shadow-lg bg-white flex flex-col items-center p-6 relative"
+                        className="w-[400px] h-[560px] rounded-xl shadow-lg bg-white flex flex-col items-center p-6 relative"
                         style={{ fontFamily: "Inter, sans-serif" }}
                     >
 
@@ -233,13 +233,13 @@ const Card: React.FC = () => {
 
                         <div className="mt-4 text-center">
                             <h2 className="text-xl font-bold text-gray-800">{id.name}</h2>
-                            <div className="flex items-center justify-center mt-1 space-x-2">
-                                <p className="text-sm text-gray-600">Field Member</p>
+                            <div className="flex flex-col items-center justify-center mt-1 space-x-2">
                                 <img
                                     src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg"
                                     alt="Company Logo"
                                     className="h-8"
                                 />
+                                <p className="text-sm text-gray-600">Field Member</p>
                             </div>
                         </div>
 
@@ -294,7 +294,7 @@ const Card: React.FC = () => {
                         </div>
 
 
-                        <div className="absolute bottom-4 right-4 w-24 h-24">
+                        <div className="absolute bottom-6 right-4 w-24 h-24">
                             <img
                                 src={id.qrCode}
                                 alt="QR Code"
