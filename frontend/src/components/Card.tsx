@@ -143,13 +143,13 @@ import html2canvas from "html2canvas"
 import jsPDF from "jspdf"
 
 interface IdCard {
-    uuid: string,
-    user_id: number,
-    name: string,
-    qrCode: string,
-    user_avatar: string,
-    bank_name?: string,
-    branch_name?: string
+    uuid: string
+    user_id: number
+    name: string
+    qrCode: string
+    user_avatar: string
+    bank_name?: any;
+    branch_name?: any;
 }
 
 const Card: React.FC = () => {
@@ -157,11 +157,13 @@ const Card: React.FC = () => {
     const path = useLocation()
     const [loading, setLoading] = useState<boolean>(false)
     const [id, setId] = useState<IdCard>({
-        uuid: '',
+        uuid: "",
         user_id: 0,
-        name: '',
-        qrCode: '',
-        user_avatar: ''
+        name: "",
+        qrCode: "",
+        user_avatar: "",
+        bank_name: [],
+        branch_name: [],
     })
 
     const downloadPDF = async () => {
@@ -169,99 +171,135 @@ const Card: React.FC = () => {
         const canvas = await html2canvas(cardRef.current, { scale: 2 })
         const imgData = canvas.toDataURL("image/png")
         const pdf = new jsPDF({
-            orientation: "landscape",
+            orientation: "portrait",
             unit: "px",
-            format: [canvas.width + 20, canvas.height + 20]
+            format: [canvas.width + 20, canvas.height + 20],
         })
         pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
         pdf.save(`${id.name}_id_card.pdf`)
     }
 
     useEffect(() => {
-        try {
-            setLoading(true)
-            const idParam = path.pathname.split('/').at(-1)
-            fetch('https://kunal-test.kunalserver.live/card/' + `${idParam}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            }).then(async (res: Response) => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+                const idParam = path.pathname.split("/").at(-1)
+                const res = await fetch(
+                    `https://kunal-test.kunalserver.live/card/${idParam}`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                    }
+                )
                 const data = await res.json()
                 if (data.valid) {
                     setId(data.userId)
-                    setLoading(false)
                 } else {
                     toast.error(data.message)
-                    setLoading(false)
                 }
-            })
-        } catch (error) {
-            toast.error('Something went wrong')
+            } catch (error) {
+                toast.error("Something went wrong")
+            } finally {
+                setLoading(false)
+            }
         }
-    }, [])
+
+        fetchData()
+    }, [path.pathname])
 
     return (
         <>
             {loading ? (
-                <Loader className="animate-spin w-8 h-8 text-gray-700" />
+                <div className="flex justify-center items-center h-screen">
+                    <Loader className="animate-spin w-8 h-8 text-gray-700" />
+                </div>
             ) : (
                 <div className="flex flex-col items-center justify-center mt-10">
                     <div
                         ref={cardRef}
-                        className="w-[500px] h-[300px] rounded-md shadow-md bg-white overflow-hidden flex"
-                        style={{ fontFamily: 'Inter, sans-serif' }}
+                        className="w-[400px] h-[550px] rounded-xl shadow-lg bg-white flex flex-col items-center p-6 relative"
+                        style={{ fontFamily: "Inter, sans-serif" }}
                     >
-                        {/* Left Section - Avatar & QR */}
-                        <div className="w-1/3 bg-gray-100 p-4 flex flex-col justify-between items-center">
-                            <div className="w-24 h-24 rounded-md overflow-hidden shadow-sm">
-                                <img
-                                    src={id.user_avatar}
-                                    alt="Avatar"
-                                    className="w-full h-full object-cover"
-                                    crossOrigin="anonymous"
-                                />
-                            </div>
 
-                            <div className="w-24 h-24 mt-auto">
+                        <div className="w-28 h-28 rounded-full overflow-hidden shadow-md border-4 border-gray-200">
+                            <img
+                                src={id.user_avatar}
+                                alt="Avatar"
+                                className="w-full h-full object-cover"
+                                crossOrigin="anonymous"
+                            />
+                        </div>
+
+
+                        <div className="mt-4 text-center">
+                            <h2 className="text-xl font-bold text-gray-800">{id.name}</h2>
+                            <div className="flex items-center justify-center mt-1 space-x-2">
+                                <p className="text-sm text-gray-600">Field Member</p>
                                 <img
-                                    src={id.qrCode}
-                                    alt="QR Code"
-                                    className="w-full h-full object-contain"
+                                    src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg"
+                                    alt="Company Logo"
+                                    className="h-8"
                                 />
                             </div>
                         </div>
 
-                        {/* Right Section - Info */}
-                        <div className="w-2/3 p-6 flex flex-col justify-between">
-                            {/* Header */}
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h2 className="text-xl font-bold text-gray-800">{id.name}</h2>
-                                    <p className="text-sm text-gray-600">Field Member</p>
-                                </div>
-                                <img
-                                    src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg"
-                                    alt="Company Logo"
-                                    className="h-10"
-                                />
+
+                        <div className="w-full mt-6 space-y-4 px-4">
+                            <div>
+                                <p className="text-xs text-gray-500 uppercase">Code</p>
+                                <p className="text-base font-semibold text-gray-800">
+                                    {id.uuid}
+                                </p>
                             </div>
 
-                            {/* Details */}
-                            <div className="mt-6 space-y-2">
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase">Code</p>
-                                    <p className="text-lg font-semibold text-gray-800">{id.uuid}</p>
-                                </div>
-
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase">Date of Birth</p>
-                                    <p className="text-lg font-semibold text-gray-800">02-06-2003</p>
-                                </div>
-
-                                <div>
-                                    <p className="text-xs text-gray-500 uppercase">Expiry Date</p>
-                                    <p className="text-lg font-semibold text-gray-800">31-12-2026</p>
-                                </div>
+                            <div>
+                                <p className="text-xs text-gray-500 uppercase">
+                                    Date of Birth
+                                </p>
+                                <p className="text-base font-semibold text-gray-800">
+                                    02-06-2003
+                                </p>
                             </div>
+
+                            <div>
+                                <p className="text-xs text-gray-500 uppercase">
+                                    Expiry Date
+                                </p>
+                                <p className="text-base font-semibold text-gray-800">
+                                    31-12-2026
+                                </p>
+                            </div>
+
+                            {id.bank_name && id.bank_name.length > 0 && (
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase">
+                                        Bank Name
+                                    </p>
+                                    <p className="text-base font-semibold text-gray-800">
+                                        {`${id.bank_name[0].bank_name} (${id.bank_name[0].bank_code})`}
+                                    </p>
+                                </div>
+                            )}
+
+                            {id.branch_name && id.branch_name.length > 0 && (
+                                <div>
+                                    <p className="text-xs text-gray-500 uppercase">
+                                        Branch Name
+                                    </p>
+                                    <p className="text-base font-semibold text-gray-800">
+                                        {`${id.branch_name[0].branch_name} (${id.branch_name[0].branch_code})`}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+
+                        <div className="absolute bottom-4 left-4 w-24 h-24">
+                            <img
+                                src={id.qrCode}
+                                alt="QR Code"
+                                className="w-full h-full object-contain"
+                            />
                         </div>
                     </div>
 
