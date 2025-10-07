@@ -134,7 +134,9 @@ app.post('/card/:dynamicId', async (req: express.Request, res: express.Response)
             body: form
         })
         const response = await registerd_user.json()
-        if (response.data.active != '1') {
+        console.log(response)
+
+        if (response.data.active !== '1' || response.status !== '1') {
             res.status(401).json({
                 message: 'You are not permitted by the admin yet'
             })
