@@ -317,8 +317,8 @@ const Card: React.FC = () => {
                         Download as PDF
                     </button>
                 </div> : <div className="flex flex-col items-center justify-center gap-4 w-screen h-screen">
-                    <p>{message}</p>
-                    <p>After getting approval get your ID card at {`https://dynamic-id-card.vercel.app/card/${path.pathname.split("/").at(-1)}`}</p>
+                    <p className="text-2xl font-bold">{message}</p>
+                    <p className="text-lg font-semibold">After getting approval get your ID card at <span onClick={() => window.open(`https://dynamic-id-card.vercel.app/card/${path.pathname.split("/").at(-1)}`, '_blank')} className="text-blue cursor-pointer text-underline">{`https://dynamic-id-card.vercel.app/card/${path.pathname.split("/").at(-1)}`}</span></p>
                 </div>
             )}
         </>
