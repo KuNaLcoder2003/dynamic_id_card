@@ -224,11 +224,18 @@ const Card: React.FC = () => {
                 permitted ? <div className="flex flex-col items-center justify-center mt-10">
                     <div
                         ref={cardRef}
-                        className="w-[400px] h-[560px] rounded-xl shadow-lg bg-white flex flex-col items-center p-6 relative"
-                        style={{ fontFamily: "Inter, sans-serif" }}
+                        className="w-[400px] h-[560px] rounded-xl shadow-lg flex flex-col items-center p-6 relative"
+                        style={{
+                            fontFamily: "Inter, sans-serif",
+                            backgroundColor: "#ffffff",
+                            color: "#1f2937",
+                        }}
                     >
 
-                        <div className="w-28 h-28 rounded-full overflow-hidden shadow-md border-4 border-gray-200">
+                        <div
+                            className="w-28 h-28 rounded-full overflow-hidden shadow-md border-4"
+                            style={{ borderColor: "#e5e7eb" }}
+                        >
                             <img
                                 src={id.user_avatar}
                                 alt="Avatar"
@@ -239,50 +246,87 @@ const Card: React.FC = () => {
 
 
                         <div className="mt-4 text-center">
-                            <h2 className="text-xl font-bold text-gray-800">{id.name}</h2>
+                            <h2
+                                className="text-xl font-bold"
+                                style={{ color: "#1f2937" }}
+                            >
+                                {id.name}
+                            </h2>
+
                             <div className="flex flex-col items-center justify-center mt-1 space-x-2">
                                 <img
                                     src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg"
                                     alt="Company Logo"
                                     className="h-8"
                                 />
-                                <p className="text-sm text-gray-600">Field Member</p>
+                                <p
+                                    className="text-sm"
+                                    style={{ color: "#4b5563" }}
+                                >
+                                    Field Member
+                                </p>
                             </div>
                         </div>
 
-
+                        {/* Details */}
                         <div className="w-full mt-6 space-y-4 px-4">
                             <div>
-                                <p className="text-xs text-gray-500 uppercase">Code</p>
-                                <p className="text-base font-semibold text-gray-800">
+                                <p
+                                    className="text-xs uppercase"
+                                    style={{ color: "#6b7280" }}
+                                >
+                                    Code
+                                </p>
+                                <p
+                                    className="text-base font-semibold"
+                                    style={{ color: "#1f2937" }}
+                                >
                                     {id.uuid}
                                 </p>
                             </div>
 
                             <div>
-                                <p className="text-xs text-gray-500 uppercase">
+                                <p
+                                    className="text-xs uppercase"
+                                    style={{ color: "#6b7280" }}
+                                >
                                     Date of Birth
                                 </p>
-                                <p className="text-base font-semibold text-gray-800">
+                                <p
+                                    className="text-base font-semibold"
+                                    style={{ color: "#1f2937" }}
+                                >
                                     02-06-2003
                                 </p>
                             </div>
 
                             <div>
-                                <p className="text-xs text-gray-500 uppercase">
+                                <p
+                                    className="text-xs uppercase"
+                                    style={{ color: "#6b7280" }}
+                                >
                                     Expiry Date
                                 </p>
-                                <p className="text-base font-semibold text-gray-800">
+                                <p
+                                    className="text-base font-semibold"
+                                    style={{ color: "#1f2937" }}
+                                >
                                     31-12-2026
                                 </p>
                             </div>
 
                             {id.bank_name && id.bank_name.length > 0 && (
                                 <div>
-                                    <p className="text-xs text-gray-500 uppercase">
+                                    <p
+                                        className="text-xs uppercase"
+                                        style={{ color: "#6b7280" }}
+                                    >
                                         Bank Name
                                     </p>
-                                    <p className="text-base font-semibold text-gray-800">
+                                    <p
+                                        className="text-base font-semibold"
+                                        style={{ color: "#1f2937" }}
+                                    >
                                         {`${id.bank_name[0].bank_name} (${id.bank_name[0].bank_code})`}
                                     </p>
                                 </div>
@@ -290,10 +334,16 @@ const Card: React.FC = () => {
 
                             {id.branch_name && id.branch_name.length > 0 && (
                                 <div>
-                                    <p className="text-xs text-gray-500 uppercase">
+                                    <p
+                                        className="text-xs uppercase"
+                                        style={{ color: "#6b7280" }}
+                                    >
                                         Branch Name
                                     </p>
-                                    <p className="text-base font-semibold text-gray-800">
+                                    <p
+                                        className="text-base font-semibold"
+                                        style={{ color: "#1f2937" }}
+                                    >
                                         {`${id.branch_name[0].branch_name} (${id.branch_name[0].branch_code})`}
                                     </p>
                                 </div>
@@ -301,7 +351,10 @@ const Card: React.FC = () => {
                         </div>
 
 
-                        <div className="absolute bottom-2 right-4 w-24 h-24">
+                        <div
+                            className="absolute bottom-2 right-4 w-24 h-24"
+                            style={{ backgroundColor: "transparent" }}
+                        >
                             <img
                                 src={id.qrCode}
                                 alt="QR Code"
@@ -309,6 +362,7 @@ const Card: React.FC = () => {
                             />
                         </div>
                     </div>
+
 
                     <button
                         onClick={downloadPDF}
