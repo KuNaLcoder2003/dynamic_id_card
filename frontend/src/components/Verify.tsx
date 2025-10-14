@@ -8,7 +8,7 @@ interface IdCard {
     name: string;
     qrCode: string;
     user_avatar: string;
-    bank_name: any;
+    bank_name: any[];
     branch_name: any;
 }
 
@@ -23,8 +23,8 @@ const Verify: React.FC = () => {
         name: "",
         qrCode: "",
         user_avatar: "",
-        bank_name: "",
-        branch_name: ""
+        bank_name: [],
+        branch_name: {}
     });
 
     const handleVerify = async () => {
@@ -99,7 +99,7 @@ const Verify: React.FC = () => {
                                 <span className="font-semibold">Bank:</span> {id.bank_name[0].bank_name}
                             </p>
                             <p>
-                                <span className="font-semibold">Branch:</span> {id.branch_name[0].branch_name}
+                                <span className="font-semibold">Branch:</span> {id.branch_name.branch_name}
                             </p>
                         </div>
                     </div>

@@ -26,8 +26,8 @@ const Card: React.FC = () => {
         name: "",
         qrCode: "",
         user_avatar: "",
-        bank_name: [],
-        branch_name: [],
+        bank_name: {},
+        branch_name: {},
     })
     const [message, setMessage] = useState<string>("")
 
@@ -202,7 +202,7 @@ const Card: React.FC = () => {
                                         className="text-base font-semibold"
                                         style={{ color: "#1f2937" }}
                                     >
-                                        {`${id.branch_name[0].branch_name} (${id.branch_name[0].branch_code})`}
+                                        {`${id.branch_name.branch_name} (${id.branch_name.branch_code})`}
                                     </p>
                                 </div>
                             )}
