@@ -1,140 +1,3 @@
-// import { Loader } from "lucide-react"
-// import React, { useEffect, useRef, useState } from "react"
-// import toast from "react-hot-toast"
-// import { useLocation } from "react-router-dom"
-// import html2canvas from "html2canvas"
-// import jsPDF from "jspdf"
-
-// interface IdCard {
-//     uuid: string,
-//     user_id: number,
-//     name: string,
-//     qrCode: string,
-//     user_avatar: string
-// }
-
-
-
-// const Card: React.FC = () => {
-//     const cardRef = useRef<HTMLDivElement>(null)
-//     const path = useLocation()
-//     const [loading, setLoading] = useState<boolean>(false)
-//     const [id, setId] = useState<IdCard>({
-//         uuid: '',
-//         user_id: 0,
-//         name: '',
-//         qrCode: '',
-//         user_avatar: ''
-//     })
-//     const downloadPDF = async () => {
-//         if (!cardRef.current) return
-
-//         const canvas = await html2canvas(cardRef.current, { scale: 1 }) // High resolution
-//         const imgData = canvas.toDataURL("image/png")
-//         const pdf = new jsPDF({
-//             orientation: "landscape",
-//             unit: "px",
-//             format: [canvas.width, canvas.height]
-//         })
-//         pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
-//         pdf.save(`${id.name}_id_card.pdf`)
-//     }
-//     useEffect(() => {
-//         try {
-//             setLoading(true)
-//             const id = path.pathname.split('/').at(-1)
-//             fetch('https://kunal-test.kunalserver.live/card/' + `${id}`, {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json'
-//                 },
-//             }).then(async (res: Response) => {
-//                 const data = await res.json()
-//                 if (data.valid) {
-//                     setId(data.userId)
-//                     setLoading(false)
-//                 } else {
-//                     toast.error(data.message)
-//                     setLoading(false)
-//                 }
-//             })
-//         } catch (error) {
-//             toast.error('Sonmething went wrong')
-//         }
-//     }, [])
-//     return (
-//         <>
-//             {
-//                 loading ? <Loader /> : <div className="flex flex-col items-center justify-center">
-//                     <div ref={cardRef} className="w-128 h-96 mt-50  rounded-2xl shadow-2xl overflow-hidden relative" style={{ background: 'white' }}>
-
-//                         <div className="absolute left-0 top-0 bottom-0 w-48 p-6 flex flex-col items-center justify-between" style={{ background: "linear-gradient(to bottom right, #065f46, #064e3b)" }}>
-
-//                             <div className="w-32 h-32 rounded-lg flex items-center justify-center shadow-lg" style={{ background: 'white' }}>
-//                                 <div className="w-28 h-28 rounded-lg flex items-center justify-center">
-//                                     <img src={id.user_avatar} crossOrigin="anonymous" />
-//                                 </div>
-//                             </div>
-
-//                             <div className="text-center w-full">
-//                                 <h2 className="font-bold text-lg tracking-wide mb-1" style={{ color: 'white' }}>{id.name}</h2>
-//                                 <p className="text-sm font-medium" style={{ color: 'green' }}>{'Feild member'}</p>
-//                             </div>
-
-
-//                             <div className="w-32 h-32 rounded-lg p-2 shadow-lg" style={{ background: 'white' }}>
-//                                 <img
-//                                     src={id.qrCode}
-//                                     alt="QR Code"
-//                                     className="w-full h-full object-contain"
-//                                 />
-//                             </div>
-//                         </div>
-
-
-//                         <div className="absolute right-0 top-0 bottom-0 left-48 p-6 flex flex-col justify-between">
-
-//                             <div className="text-right">
-//                                 <div className="flex items-center justify-end gap-2 mb-2">
-//                                     <img src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg" />
-
-//                                 </div>
-//                                 <div className="text-xs font-semibold tracking-wider" style={{ color: 'green' }}>EMPLOYEE IDENTIFICATION</div>
-//                             </div>
-
-
-//                             <div className="space-y-3">
-//                                 <div>
-//                                     <div className="text-xs font-semibold mb-1" style={{ color: 'green' }}>CODE</div>
-//                                     <div className="font-bold text-xl tracking-wide" style={{ color: 'green' }}>{id.uuid}</div>
-//                                 </div>
-
-//                                 <div>
-//                                     <div className="text-xs font-semibold mb-1" style={{ color: 'green' }}> DATE OF BIRTH</div>
-//                                     <div className="font-bold text-lg" style={{ color: 'green' }}>{'02-06-2003'}</div>
-//                                 </div>
-
-//                                 <div>
-//                                     <div className="text-xs font-semibold mb-1" style={{ color: 'green' }}>EXP DATE</div>
-//                                     <div className="font-bold text-lg" style={{ color: 'green' }}>{'31-12-2026'}</div>
-//                                 </div>
-//                             </div>
-//                         </div>
-
-
-//                         <div style={{ background: "linear-gradient(to bottom right, #065f46, #064e3b)" }}></div>
-
-//                     </div>
-//                     <button onClick={downloadPDF} className="px-4 py-2 bg-green-700 text-white rounded-md">
-//                         Download as PDF
-//                     </button>
-//                 </div>
-//             }
-//         </>
-//     )
-// }
-
-// export default Card
 import { Loader } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import toast from "react-hot-toast"
@@ -148,8 +11,8 @@ interface IdCard {
     name: string
     qrCode: string
     user_avatar: string
-    bank_name?: any;
-    branch_name?: any;
+    bank_name?: any
+    branch_name?: any
 }
 
 const Card: React.FC = () => {
@@ -170,14 +33,40 @@ const Card: React.FC = () => {
 
     const downloadPDF = async () => {
         if (!cardRef.current) return
-        const canvas = await html2canvas(cardRef.current, { scale: 2 })
+
+        const cardElement = cardRef.current
+
+        // Wait for images to load before capture
+        const images = cardElement.querySelectorAll("img")
+        await Promise.all(
+            Array.from(images).map(
+                (img) =>
+                    new Promise<void>((resolve) => {
+                        if (img.complete) resolve()
+                        else img.onload = () => resolve()
+                    })
+            )
+        )
+
+        // Capture the card
+        const canvas = await html2canvas(cardElement, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            scrollX: 0,
+            scrollY: 0,
+        })
         const imgData = canvas.toDataURL("image/png")
+
+        // Create PDF with the same aspect ratio as the card
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "px",
-            format: [canvas.width + 20, canvas.height + 20],
+            format: [canvas.width + 40, canvas.height + 40], // added buffer
         })
-        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height)
+
+        // Add image with a small top/left margin
+        pdf.addImage(imgData, "PNG", 20, 20, canvas.width, canvas.height)
         pdf.save(`${id.name}_id_card.pdf`)
     }
 
@@ -185,9 +74,9 @@ const Card: React.FC = () => {
         const fetchData = async () => {
             try {
                 setLoading(true)
-                const idParam = path.pathname.split("/").at(-1)
+                // const idParam = path.pathname.split("/").at(-1)
                 const res = await fetch(
-                    `https://kunal-test.kunalserver.live/card/${idParam}`,
+                    `https://sugee.io/KYCServiceAPI/kycapi/VerifyID/9322725437`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -201,13 +90,11 @@ const Card: React.FC = () => {
                     toast.error(data.message)
                     setMessage(data.message)
                     setPermitted(false)
-
                 }
             } catch (error) {
                 toast.error("Something went wrong")
             } finally {
                 setLoading(false)
-
             }
         }
 
@@ -220,76 +107,56 @@ const Card: React.FC = () => {
                 <div className="flex justify-center items-center h-screen">
                     <Loader className="animate-spin w-8 h-8 text-gray-700" />
                 </div>
-            ) : (
-                permitted ? <div className="flex flex-col items-center justify-center mt-10">
+            ) : permitted ? (
+                <div className="flex flex-col items-center justify-center mt-10">
                     <div
                         ref={cardRef}
-                        className="w-[400px] h-[560px] rounded-xl shadow-lg flex flex-col items-center p-6 relative"
+                        className="w-[400px] h-[560px] rounded-xl shadow-lg flex flex-col items-center p-6 pb-14 relative"
                         style={{
                             fontFamily: "Inter, sans-serif",
                             backgroundColor: "#ffffff",
                             color: "#1f2937",
                         }}
                     >
-
+                        {/* QR Code (replaces avatar) */}
                         <div
-                            className="w-28 h-28 rounded-full overflow-hidden shadow-md border-4"
+                            className="w-28 h-28 overflow-hidden shadow-md border-4 flex items-center justify-center"
                             style={{ borderColor: "#e5e7eb" }}
                         >
                             <img
-                                src={id.user_avatar}
-                                alt="Avatar"
-                                className="w-full h-full object-cover"
+                                src={id.qrCode}
+                                alt="QR Code"
+                                className="w-full h-full object-contain"
                                 crossOrigin="anonymous"
                             />
                         </div>
 
-
+                        {/* User Info */}
                         <div className="mt-4 text-center">
-                            <h2
-                                className="text-xl font-bold"
-                                style={{ color: "#1f2937" }}
-                            >
+                            <h2 className="text-xl font-bold" style={{ color: "#1f2937" }}>
                                 {id.name}
                             </h2>
-
-                            <div className="flex flex-col items-center justify-center mt-1 space-x-2">
-                                <img
-                                    src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg"
-                                    alt="Company Logo"
-                                    className="h-8"
-                                />
-                                <p
-                                    className="text-sm"
-                                    style={{ color: "#4b5563" }}
-                                >
-                                    Field Member
-                                </p>
-                            </div>
+                            <p className="text-sm mt-1" style={{ color: "#4b5563" }}>
+                                Field Consultant
+                            </p>
                         </div>
 
                         {/* Details */}
                         <div className="w-full mt-6 space-y-4 px-4">
                             <div>
-                                <p
-                                    className="text-xs uppercase"
-                                    style={{ color: "#6b7280" }}
-                                >
+                                <p className="text-xs uppercase" style={{ color: "#6b7280" }}>
                                     Code
                                 </p>
                                 <p
                                     className="text-base font-semibold"
                                     style={{ color: "#1f2937" }}
                                 >
-                                    {id.uuid}
+                                    T_{id.uuid}
                                 </p>
                             </div>
 
-                            <div>
-                                <p
-                                    className="text-xs uppercase"
-                                    style={{ color: "#6b7280" }}
-                                >
+                            {/* <div>
+                                <p className="text-xs uppercase" style={{ color: "#6b7280" }}>
                                     Date of Birth
                                 </p>
                                 <p
@@ -298,13 +165,10 @@ const Card: React.FC = () => {
                                 >
                                     02-06-2003
                                 </p>
-                            </div>
+                            </div> */}
 
                             <div>
-                                <p
-                                    className="text-xs uppercase"
-                                    style={{ color: "#6b7280" }}
-                                >
+                                <p className="text-xs uppercase" style={{ color: "#6b7280" }}>
                                     Expiry Date
                                 </p>
                                 <p
@@ -317,10 +181,7 @@ const Card: React.FC = () => {
 
                             {id.bank_name && id.bank_name.length > 0 && (
                                 <div>
-                                    <p
-                                        className="text-xs uppercase"
-                                        style={{ color: "#6b7280" }}
-                                    >
+                                    <p className="text-xs uppercase" style={{ color: "#6b7280" }}>
                                         Bank Name
                                     </p>
                                     <p
@@ -334,10 +195,7 @@ const Card: React.FC = () => {
 
                             {id.branch_name && id.branch_name.length > 0 && (
                                 <div>
-                                    <p
-                                        className="text-xs uppercase"
-                                        style={{ color: "#6b7280" }}
-                                    >
+                                    <p className="text-xs uppercase" style={{ color: "#6b7280" }}>
                                         Branch Name
                                     </p>
                                     <p
@@ -350,19 +208,17 @@ const Card: React.FC = () => {
                             )}
                         </div>
 
-
-                        <div
-                            className="absolute bottom-2 right-4 w-24 h-24"
-                            style={{ backgroundColor: "transparent" }}
-                        >
+                        {/* Logo - adjusted position to prevent crop */}
+                        <div className="absolute bottom-8 right-8 w-10 h-10">
                             <img
-                                src={id.qrCode}
-                                alt="QR Code"
+                                src="/logo.svg"
+                                alt="Company Logo"
                                 className="w-full h-full object-contain"
+                                crossOrigin="anonymous"
+                                style={{ maxWidth: "40px", maxHeight: "40px" }}
                             />
                         </div>
                     </div>
-
 
                     <button
                         onClick={downloadPDF}
@@ -370,9 +226,28 @@ const Card: React.FC = () => {
                     >
                         Download as PDF
                     </button>
-                </div> : <div className="flex flex-col items-center justify-center gap-4 w-screen h-screen">
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center gap-4 w-screen h-screen">
                     <p className="text-2xl font-bold">{message}</p>
-                    <p className="text-lg font-semibold">After getting approval get your ID card at <span onClick={() => window.open(`https://dynamic-id-card.vercel.app/card/${path.pathname.split("/").at(-1)}`, '_blank')} className="text-blue-400 cursor-pointer text-underline">{`https://dynamic-id-card.vercel.app/card/${path.pathname.split("/").at(-1)}`}</span></p>
+                    <p className="text-lg font-semibold">
+                        After getting approval get your ID card at{" "}
+                        <span
+                            onClick={() =>
+                                window.open(
+                                    `https://dynamic-id-card.vercel.app/card/${path.pathname
+                                        .split("/")
+                                        .at(-1)}`,
+                                    "_blank"
+                                )
+                            }
+                            className="text-blue-400 cursor-pointer underline"
+                        >
+                            {`https://dynamic-id-card.vercel.app/card/${path.pathname
+                                .split("/")
+                                .at(-1)}`}
+                        </span>
+                    </p>
                 </div>
             )}
         </>

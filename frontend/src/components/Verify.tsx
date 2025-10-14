@@ -37,7 +37,7 @@ const Verify: React.FC = () => {
 
         try {
             const res = await fetch(
-                `https://kunal-test.kunalserver.live/verify/${userId}`,
+                `https://sugee.io/KYCServiceAPI/kycapi/VerifyID/${userId}`,
                 {
                     method: "POST",
                     headers: {
