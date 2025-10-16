@@ -23,7 +23,9 @@ const Card: React.FC = () => {
     const [permitted, setPermitted] = useState<boolean>(true);
     const [validTill, setValidTill] = useState("");
     const [validFrom, setValidFrom] = useState("");
-    const [logoBase64, setLogoBase64] = useState<string>("");
+
+
+
 
     const [id, setId] = useState<IdCard>({
         uuid: "",
@@ -38,19 +40,7 @@ const Card: React.FC = () => {
     });
 
     // Convert SVG logo to Base64
-    useEffect(() => {
-        const convertLogoToBase64 = async () => {
-            try {
-                const response = await fetch("/logo.svg");
-                const svgText = await response.text();
-                const base64 = `data:image/svg+xml;base64,${btoa(svgText)}`;
-                setLogoBase64(base64);
-            } catch (error) {
-                console.error("Failed to load logo:", error);
-            }
-        };
-        convertLogoToBase64();
-    }, []);
+
 
     // Fetch ID data
     useEffect(() => {
