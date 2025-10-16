@@ -1,9 +1,8 @@
-import { Loader } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { Loader } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
-
-import * as htmlToImage from "html-to-image";
+import rasterizeHTML from "rasterizehtml";
 
 interface IdCard {
     uuid: string;
@@ -38,39 +37,32 @@ const Card: React.FC = () => {
         valid_till: "",
     });
 
-    // Convert logo to base64
     useEffect(() => {
         const convertLogoToBase64 = async () => {
             try {
                 const response = await fetch("/logo.svg");
                 const blob = await response.blob();
                 const reader = new FileReader();
-
                 reader.onloadend = () => {
-                    if (typeof reader.result === "string") {
-                        setLogoBase64(reader.result);
-                    }
+                    if (typeof reader.result === "string") setLogoBase64(reader.result);
                 };
-
                 reader.readAsDataURL(blob);
-            } catch (error) {
-                console.error("Failed to load logo:", error);
+            } catch (err) {
+                console.error("Failed to load logo:", err);
             }
         };
-
         convertLogoToBase64();
     }, []);
 
-    // Fetch ID card data
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
                 const idParam = path.pathname.split("/").at(-1);
-                const res = await fetch(
-                    `https://sugee.io/KYCServiceAPI/kycapi/VerifyID/${idParam}`,
-                    { method: "POST", headers: { "Content-Type": "application/json" } }
-                );
+                const res = await fetch(`https://sugee.io/KYCServiceAPI/kycapi/VerifyID/${idParam}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                });
                 const data = await res.json();
                 if (data.valid) {
                     setId(data.userId);
@@ -81,219 +73,123 @@ const Card: React.FC = () => {
                     toast.error(data.message);
                     setPermitted(false);
                 }
-            } catch (error) {
+            } catch (err) {
                 toast.error("Something went wrong");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [path.pathname]);
 
-    // Download card as image
     const downloadImage = async () => {
-        if (!cardRef.current) {
-            toast.error("Card not ready");
-            return;
-        }
+        if (!cardRef.current) return toast.error("Card not ready");
 
         try {
-            const dataUrl = await htmlToImage.toPng(cardRef.current, {
-                cacheBust: true,
-                backgroundColor: "#ffffff",
-                pixelRatio: 2, // improves mobile quality,
-            });
+            const htmlString = cardRef.current.outerHTML;
+
+            // Create a temporary canvas
+            const canvas = document.createElement("canvas");
+            canvas.width = cardRef.current.offsetWidth * 2; // scale for high-res
+            canvas.height = cardRef.current.offsetHeight * 2;
+
+            // Draw HTML into the canvas
+            await rasterizeHTML.drawHTML(htmlString, canvas);
+
+            // Convert canvas to image
+            const dataUrl = canvas.toDataURL("image/png");
 
             const link = document.createElement("a");
-            link.download = `${id.name}_ID_CARD.png`;
             link.href = dataUrl;
+            link.download = `${id.name}_ID_CARD.png`;
             link.click();
         } catch (err) {
-            console.error("Image generation failed:", err);
-            toast.error("Failed to download image");
+            console.error("Failed to generate image:", err);
+            toast.error("Failed to download ID");
         }
     };
 
     return (
         <>
             {loading ? (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100vh",
-                    }}
-                >
-                    <Loader
-                        className="animate-spin"
-                        style={{ width: "32px", height: "32px", color: "#374151" }}
-                    />
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+                    <Loader className="animate-spin" style={{ width: 32, height: 32 }} />
                 </div>
             ) : permitted ? (
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginTop: "40px",
-                    }}
-                >
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 40 }}>
                     <div
                         ref={cardRef}
                         style={{
-                            width: "400px",
-                            height: "560px",
-                            borderRadius: "16px",
+                            width: 400,
+                            height: 560,
+                            borderRadius: 16,
                             boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            padding: "24px",
-                            backgroundColor: "#ffffff",
+                            padding: 24,
+                            backgroundColor: "#fff",
                             fontFamily: "Inter, sans-serif",
                             color: "#1f2937",
                         }}
                     >
                         {/* Logo */}
-                        <div style={{ width: "64px", height: "64px", marginBottom: "16px" }}>
+                        <div style={{ width: 64, height: 64, marginBottom: 16 }}>
                             {logoBase64 ? (
-                                <img
-                                    src={logoBase64}
-                                    alt="Company Logo"
-                                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                                />
+                                <img src={logoBase64} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                             ) : (
-                                <Loader className="animate-spin" style={{ width: "24px", height: "24px" }} />
+                                <Loader className="animate-spin" style={{ width: 24, height: 24 }} />
                             )}
                         </div>
 
-                        {/* QR Code */}
-                        <div
-                            style={{
-                                width: "200px",
-                                height: "200px",
-                                borderRadius: "16px",
-                                overflow: "hidden",
-                                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                                border: "4px solid #e5e7eb",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        >
-                            <img
-                                src={id.qrCode}
-                                alt="QR Code"
-                                style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                            />
+                        {/* QR */}
+                        <div style={{ width: 200, height: 200, borderRadius: 16, overflow: "hidden", border: "4px solid #e5e7eb", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                            <img src={id.qrCode} alt="QR Code" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                         </div>
 
-                        {/* Name */}
-                        <div style={{ marginTop: "16px", textAlign: "center" }}>
-                            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1f2937" }}>
-                                {id.name}
-                            </h2>
-                            <p style={{ fontSize: "0.875rem", color: "#6b7280", marginTop: "4px" }}>
-                                Field Consultant
-                            </p>
-                        </div>
+                        <h2 style={{ marginTop: 16, textAlign: "center", fontSize: "1.25rem", fontWeight: 700 }}>{id.name}</h2>
+                        <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>Field Consultant</p>
 
-                        {/* Divider */}
-                        <div
-                            style={{
-                                width: "100%",
-                                borderTop: "1px solid #d1d5db",
-                                margin: "16px 0",
-                            }}
-                        ></div>
+                        <div style={{ width: "100%", borderTop: "1px solid #d1d5db", margin: "16px 0" }} />
 
                         {/* Details */}
-                        <div style={{ width: "100%", marginTop: "8px", padding: "0 16px" }}>
-                            <div style={{ marginBottom: "16px" }}>
-                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
-                                    Code
-                                </p>
-                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
-                                    T_{id.uuid}
-                                </p>
-                            </div>
+                        <div style={{ width: "100%", padding: "0 16px" }}>
+                            <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Code</p>
+                            <p style={{ fontSize: 16, fontWeight: 600 }}>T_{id.uuid}</p>
 
-                            <div style={{ marginBottom: "16px" }}>
-                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
-                                    Valid From
-                                </p>
-                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
-                                    {validFrom}
-                                </p>
-                            </div>
+                            <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Valid From</p>
+                            <p style={{ fontSize: 16, fontWeight: 600 }}>{validFrom}</p>
 
-                            <div style={{ marginBottom: "16px" }}>
-                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
-                                    Valid Till
-                                </p>
-                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
-                                    {validTill}
-                                </p>
-                            </div>
+                            <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Valid Till</p>
+                            <p style={{ fontSize: 16, fontWeight: 600 }}>{validTill}</p>
 
                             {id.bank_name?.length && (
-                                <div style={{ marginBottom: "16px" }}>
-                                    <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
-                                        Bank Name
-                                    </p>
-                                    <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
+                                <>
+                                    <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Bank Name</p>
+                                    <p style={{ fontSize: 16, fontWeight: 600 }}>
                                         {`${id.bank_name[0].bank_name} (${id.bank_name[0].bank_code})`}
                                     </p>
-                                </div>
+                                </>
                             )}
 
                             {id.branch_name?.length && (
-                                <div>
-                                    <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
-                                        Branch Name
-                                    </p>
-                                    <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
+                                <>
+                                    <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Branch Name</p>
+                                    <p style={{ fontSize: 16, fontWeight: 600 }}>
                                         {`${id.branch_name[0].branch_name} (${id.branch_name[0].branch_code})`}
                                     </p>
-                                </div>
+                                </>
                             )}
                         </div>
                     </div>
 
-                    {/* Download Button */}
-                    <button
-                        onClick={downloadImage}
-                        style={{
-                            marginTop: "24px",
-                            padding: "8px 24px",
-                            backgroundColor: "#2563eb",
-                            color: "#ffffff",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                            border: "none",
-                        }}
-                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1d4ed8")}
-                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
-                    >
+                    <button onClick={downloadImage} style={{ marginTop: 24, padding: "8px 24px", backgroundColor: "#2563eb", color: "#fff", borderRadius: 8, cursor: "pointer", border: "none" }}>
                         Download ID
                     </button>
                 </div>
             ) : (
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "16px",
-                        width: "100vw",
-                        height: "100vh",
-                    }}
-                >
-                    <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>Not Permitted</p>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+                    <p style={{ fontSize: "2rem", fontWeight: "bold" }}>Not Permitted</p>
                 </div>
             )}
         </>
