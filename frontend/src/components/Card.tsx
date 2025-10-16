@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
 import { Loader } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
 import html2canvas from "html2canvas";
@@ -37,19 +37,16 @@ const Card: React.FC = () => {
         valid_till: "",
     });
 
-    // Convert logo to Base64
+    // Convert SVG logo to Base64
     useEffect(() => {
         const convertLogoToBase64 = async () => {
             try {
                 const response = await fetch("/logo.svg");
-                const blob = await response.blob();
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    if (typeof reader.result === "string") setLogoBase64(reader.result);
-                };
-                reader.readAsDataURL(blob);
-            } catch (err) {
-                console.error("Failed to load logo:", err);
+                const svgText = await response.text();
+                const base64 = `data:image/svg+xml;base64,${btoa(svgText)}`;
+                setLogoBase64(base64);
+            } catch (error) {
+                console.error("Failed to load logo:", error);
             }
         };
         convertLogoToBase64();
@@ -61,10 +58,10 @@ const Card: React.FC = () => {
             try {
                 setLoading(true);
                 const idParam = path.pathname.split("/").at(-1);
-                const res = await fetch(`https://sugee.io/KYCServiceAPI/kycapi/VerifyID/${idParam}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                });
+                const res = await fetch(
+                    `https://sugee.io/KYCServiceAPI/kycapi/VerifyID/${idParam}`,
+                    { method: "POST", headers: { "Content-Type": "application/json" } }
+                );
                 const data = await res.json();
                 if (data.valid) {
                     setId(data.userId);
@@ -75,7 +72,7 @@ const Card: React.FC = () => {
                     toast.error(data.message);
                     setPermitted(false);
                 }
-            } catch (err) {
+            } catch (error) {
                 toast.error("Something went wrong");
             } finally {
                 setLoading(false);
@@ -84,28 +81,35 @@ const Card: React.FC = () => {
         fetchData();
     }, [path.pathname]);
 
-    // Download ID as image
+    // Wait for all images to load
+    const waitForImages = async (node: HTMLElement) => {
+        const imgs = node.querySelectorAll("img");
+        await Promise.all(
+            Array.from(imgs).map(
+                (img) =>
+                    new Promise<void>((resolve) => {
+                        if (img.complete) resolve();
+                        else {
+                            img.onload = () => resolve();
+                            img.onerror = () => resolve();
+                        }
+                    })
+            )
+        );
+    };
+
+    // Download card as image
     const downloadImage = async () => {
-        if (!cardRef.current) return toast.error("Card not ready");
-
+        if (!cardRef.current) {
+            toast.error("Card not ready");
+            return;
+        }
+        const node = cardRef.current;
         try {
-            // Wait for all images to load
-            const images = cardRef.current.querySelectorAll("img");
-            await Promise.all(
-                Array.from(images).map(
-                    (img) =>
-                        new Promise<void>((resolve) => {
-                            if (img.complete) resolve();
-                            else {
-                                img.onload = () => resolve();
-                                img.onerror = () => resolve();
-                            }
-                        })
-                )
-            );
+            await waitForImages(node);
 
-            const canvas = await html2canvas(cardRef.current, {
-                scale: 2, // higher resolution
+            const canvas = await html2canvas(node, {
+                scale: window.devicePixelRatio * 2, // handle mobile DPI
                 useCORS: true,
                 backgroundColor: "#ffffff",
             });
@@ -115,108 +119,178 @@ const Card: React.FC = () => {
             link.href = dataUrl;
             link.download = `${id.name}_ID_CARD.png`;
             link.click();
-        } catch (err) {
-            console.error("Failed to generate image:", err);
-            toast.error("Failed to download ID");
+        } catch (error) {
+            console.error("Failed to generate image:", error);
+            toast.error("Failed to generate image");
         }
     };
 
+    if (loading) {
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100vh",
+                }}
+            >
+                <Loader className="animate-spin" style={{ width: 32, height: 32 }} />
+            </div>
+        );
+    }
+
+    if (!permitted) {
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100vh",
+                    gap: 16,
+                }}
+            >
+                <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>
+                    Not Permitted
+                </p>
+            </div>
+        );
+    }
+
     return (
-        <>
-            {loading ? (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-                    <Loader className="animate-spin" style={{ width: 32, height: 32 }} />
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginTop: 40,
+            }}
+        >
+            <div
+                ref={cardRef}
+                style={{
+                    width: 400,
+                    height: 700,
+                    borderRadius: 16,
+                    boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    padding: 24,
+                    backgroundColor: "#ffffff",
+                    fontFamily: "Inter, sans-serif",
+                    color: "#1f2937",
+                }}
+            >
+                {/* Logo */}
+                <div style={{ width: 64, height: 64, marginBottom: 16 }}>
+                    {logoBase64 ? (
+                        <img
+                            src={logoBase64}
+                            alt="Company Logo"
+                            style={{
+                                width: "auto",
+                                height: "100%",
+                                objectFit: "contain",
+                                display: "block",
+                            }}
+                        />
+                    ) : (
+                        <Loader className="animate-spin" style={{ width: 24, height: 24 }} />
+                    )}
                 </div>
-            ) : permitted ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 40 }}>
-                    <div
-                        ref={cardRef}
-                        style={{
-                            width: 400,
-                            height: 560,
-                            borderRadius: 16,
-                            boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            padding: 24,
-                            backgroundColor: "#fff",
-                            fontFamily: "Inter, sans-serif",
-                            color: "#1f2937",
-                        }}
-                    >
-                        {/* Logo */}
-                        <div style={{ width: 64, height: 64, marginBottom: 16 }}>
-                            {logoBase64 ? (
-                                <img
-                                    src={logoBase64}
-                                    alt="Company Logo"
-                                    style={{
-                                        width: "auto",
-                                        height: "100%",
-                                        maxWidth: "100%",
-                                        objectFit: "contain", // important
-                                        display: "block",     // avoid inline spacing issues
-                                    }}
-                                />
-                            ) : (
-                                <Loader className="animate-spin" style={{ width: 24, height: 24 }} />
-                            )}
-                        </div>
 
-                        {/* QR Code */}
-                        <div style={{ width: 200, height: 200, borderRadius: 16, overflow: "hidden", border: "4px solid #e5e7eb", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                            <img src={id.qrCode} alt="QR Code" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                        </div>
+                {/* QR Code */}
+                <div
+                    style={{
+                        width: 200,
+                        height: 200,
+                        borderRadius: 16,
+                        overflow: "hidden",
+                        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                        border: "4px solid #e5e7eb",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
+                    <img
+                        src={id.qrCode}
+                        alt="QR Code"
+                        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                        crossOrigin="anonymous"
+                    />
+                </div>
 
-                        {/* Name */}
-                        <h2 style={{ marginTop: 16, textAlign: "center", fontSize: "1.25rem", fontWeight: 700 }}>{id.name}</h2>
-                        <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>Field Consultant</p>
+                {/* Name */}
+                <div style={{ marginTop: 16, textAlign: "center" }}>
+                    <h2 style={{ fontSize: "1.25rem", fontWeight: 700 }}>{id.name}</h2>
+                    <p style={{ fontSize: "0.875rem", color: "#6b7280", marginTop: 4 }}>
+                        Field Consultant
+                    </p>
+                </div>
 
-                        {/* Divider */}
-                        <div style={{ width: "100%", borderTop: "1px solid #d1d5db", margin: "16px 0" }} />
+                <div
+                    style={{
+                        width: "100%",
+                        borderTop: "1px solid #d1d5db",
+                        margin: "16px 0",
+                    }}
+                ></div>
 
-                        {/* Details */}
-                        <div style={{ width: "100%", padding: "0 16px" }}>
-                            <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Code</p>
-                            <p style={{ fontSize: 16, fontWeight: 600 }}>T_{id.uuid}</p>
-
-                            <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Valid From</p>
-                            <p style={{ fontSize: 16, fontWeight: 600 }}>{validFrom}</p>
-
-                            <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Valid Till</p>
-                            <p style={{ fontSize: 16, fontWeight: 600 }}>{validTill}</p>
-
-                            {id.bank_name?.length && (
-                                <>
-                                    <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Bank Name</p>
-                                    <p style={{ fontSize: 16, fontWeight: 600 }}>
-                                        {`${id.bank_name[0].bank_name} (${id.bank_name[0].bank_code})`}
-                                    </p>
-                                </>
-                            )}
-
-                            {id.branch_name?.length && (
-                                <>
-                                    <p style={{ fontSize: 12, textTransform: "uppercase", color: "#6b7280" }}>Branch Name</p>
-                                    <p style={{ fontSize: 16, fontWeight: 600 }}>
-                                        {`${id.branch_name[0].branch_name} (${id.branch_name[0].branch_code})`}
-                                    </p>
-                                </>
-                            )}
-                        </div>
+                {/* Details */}
+                <div style={{ width: "100%", marginTop: 8, padding: "0 16px" }}>
+                    <div style={{ marginBottom: 16 }}>
+                        <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
+                            Code
+                        </p>
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>T_{id.uuid}</p>
                     </div>
+                    <div style={{ marginBottom: 16 }}>
+                        <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
+                            Valid From
+                        </p>
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>{validFrom}</p>
+                    </div>
+                    <div style={{ marginBottom: 16 }}>
+                        <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
+                            Valid Till
+                        </p>
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>{validTill}</p>
+                    </div>
+                    <div style={{ marginBottom: 16 }}>
+                        <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
+                            Bank
+                        </p>
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>{id.bank_name[0].bank_name}</p>
+                    </div>
+                    <div style={{ marginBottom: 16 }}>
+                        <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
+                            Branch
+                        </p>
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>{id.branch_name.branch_name}</p>
+                    </div>
+                </div>
+            </div>
 
-                    <button onClick={downloadImage} style={{ marginTop: 24, padding: "8px 24px", backgroundColor: "#2563eb", color: "#fff", borderRadius: 8, cursor: "pointer", border: "none" }}>
-                        Download ID
-                    </button>
-                </div>
-            ) : (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-                    <p style={{ fontSize: "2rem", fontWeight: "bold" }}>Not Permitted</p>
-                </div>
-            )}
-        </>
+            {/* Download Button */}
+            <button
+                onClick={downloadImage}
+                style={{
+                    marginTop: 24,
+                    padding: "8px 24px",
+                    backgroundColor: "#2563eb",
+                    color: "#fff",
+                    borderRadius: 8,
+                    border: "none",
+                    cursor: "pointer",
+                }}
+            >
+                Download ID
+            </button>
+        </div>
     );
 };
 
