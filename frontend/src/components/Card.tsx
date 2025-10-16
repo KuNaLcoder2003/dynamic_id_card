@@ -148,7 +148,17 @@ const Card: React.FC = () => {
                         {/* Logo */}
                         <div style={{ width: 64, height: 64, marginBottom: 16 }}>
                             {logoBase64 ? (
-                                <img src={logoBase64} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                                <img
+                                    src={logoBase64}
+                                    alt="Company Logo"
+                                    style={{
+                                        width: "auto",
+                                        height: "100%",
+                                        maxWidth: "100%",
+                                        objectFit: "contain", // important
+                                        display: "block",     // avoid inline spacing issues
+                                    }}
+                                />
                             ) : (
                                 <Loader className="animate-spin" style={{ width: 24, height: 24 }} />
                             )}
