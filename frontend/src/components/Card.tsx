@@ -109,7 +109,7 @@ const Card: React.FC = () => {
             await waitForImages(node);
 
             const canvas = await html2canvas(node, {
-                scale: window.devicePixelRatio * 2, // handle mobile DPI
+                scale: window.devicePixelRatio * 1, // handle mobile DPI
                 useCORS: true,
                 backgroundColor: "#ffffff",
             });
@@ -169,9 +169,10 @@ const Card: React.FC = () => {
             }}
         >
             <div
+                className="p-4"
                 ref={cardRef}
                 style={{
-                    width: 400,
+                    width: 450,
                     height: 700,
                     borderRadius: 16,
                     boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
@@ -185,21 +186,8 @@ const Card: React.FC = () => {
                 }}
             >
                 {/* Logo */}
-                <div style={{ width: 64, height: 64, marginBottom: 16 }}>
-                    {logoBase64 ? (
-                        <img
-                            src={logoBase64}
-                            alt="Company Logo"
-                            style={{
-                                width: "auto",
-                                height: "100%",
-                                objectFit: "contain",
-                                display: "block",
-                            }}
-                        />
-                    ) : (
-                        <Loader className="animate-spin" style={{ width: 24, height: 24 }} />
-                    )}
+                <div className="m-auto p-4" style={{ width: "50%", height: 64, marginBottom: 16, backgroundImage: `url(/logo.svg)`, backgroundRepeat: "no-repeat", backgroundPositionX: "50%" }}>
+
                 </div>
 
                 {/* QR Code */}
