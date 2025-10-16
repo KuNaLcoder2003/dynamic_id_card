@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
 // @ts-ignore
-import domtoimage from 'dom-to-image';
+import domtoimage from "dom-to-image";
 
 interface IdCard {
     uuid: string;
@@ -20,11 +20,13 @@ interface IdCard {
 const Card: React.FC = () => {
     const cardRef = useRef<HTMLDivElement>(null);
     const path = useLocation();
+
     const [loading, setLoading] = useState<boolean>(true);
     const [permitted, setPermitted] = useState<boolean>(true);
     const [validTill, setValidTill] = useState("");
     const [validFrom, setValidFrom] = useState("");
     const [logoBase64, setLogoBase64] = useState<string>("");
+    const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
 
     const [id, setId] = useState<IdCard>({
         uuid: "",
@@ -44,6 +46,11 @@ const Card: React.FC = () => {
             return;
         }
 
+        if (!imagesLoaded) {
+            toast.error("Please wait for images to load");
+            return;
+        }
+
         const node = cardRef.current;
 
         domtoimage
@@ -51,12 +58,13 @@ const Card: React.FC = () => {
                 quality: 1,
                 bgcolor: "#ffffff",
                 cacheBust: true,
+                useCORS: true,
+                width: node.offsetWidth,
+                height: node.offsetHeight,
                 style: {
                     transform: "scale(1)",
                     transformOrigin: "top left",
                 },
-                width: node.offsetWidth * 1,
-                height: node.offsetHeight * 1,
             })
             .then((dataUrl: string) => {
                 const link = document.createElement("a");
@@ -70,11 +78,9 @@ const Card: React.FC = () => {
             });
     };
 
-
     useEffect(() => {
         const convertLogoToBase64 = async () => {
             try {
-                // Just use /logo.svg — this automatically refers to your public folder
                 const response = await fetch("/logo.svg");
                 const blob = await response.blob();
                 const reader = new FileReader();
@@ -126,6 +132,22 @@ const Card: React.FC = () => {
         fetchData();
     }, [path.pathname]);
 
+    // ✅ Wait until both logo & QR images are loaded before allowing download
+    useEffect(() => {
+        if (logoBase64 && id.qrCode) {
+            const logoImg = new Image();
+            const qrImg = new Image();
+
+            logoImg.src = logoBase64;
+            qrImg.src = id.qrCode;
+
+            Promise.all([
+                new Promise((resolve) => (logoImg.onload = resolve)),
+                new Promise((resolve) => (qrImg.onload = resolve)),
+            ]).then(() => setImagesLoaded(true));
+        }
+    }, [logoBase64, id.qrCode]);
+
     return (
         <>
             {loading ? (
@@ -168,7 +190,7 @@ const Card: React.FC = () => {
                             color: "#1f2937",
                         }}
                     >
-                        {/* ✅ Logo (Base64) */}
+                        {/* ✅ Logo */}
                         <div style={{ width: "64px", height: "64px", marginBottom: "16px" }}>
                             {logoBase64 ? (
                                 <img
@@ -177,13 +199,14 @@ const Card: React.FC = () => {
                                     style={{ width: "100%", height: "100%", objectFit: "contain" }}
                                 />
                             ) : (
-                                <Loader className="animate-spin" style={{ width: "24px", height: "24px" }} />
+                                <Loader
+                                    className="animate-spin"
+                                    style={{ width: "24px", height: "24px" }}
+                                />
                             )}
                         </div>
 
-                        {/* QR */}
-
-
+                        {/* ✅ QR Code */}
                         <div
                             style={{
                                 width: "200px",
@@ -205,16 +228,26 @@ const Card: React.FC = () => {
                             />
                         </div>
 
-
                         <div style={{ marginTop: "16px", textAlign: "center" }}>
-                            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1f2937" }}>
+                            <h2
+                                style={{
+                                    fontSize: "1.25rem",
+                                    fontWeight: 700,
+                                    color: "#1f2937",
+                                }}
+                            >
                                 {id.name}
                             </h2>
-                            <p style={{ fontSize: "0.875rem", color: "#6b7280", marginTop: "4px" }}>
+                            <p
+                                style={{
+                                    fontSize: "0.875rem",
+                                    color: "#6b7280",
+                                    marginTop: "4px",
+                                }}
+                            >
                                 Field Consultant
                             </p>
                         </div>
-
 
                         <div
                             style={{
@@ -224,41 +257,77 @@ const Card: React.FC = () => {
                             }}
                         ></div>
 
-                        {/* Details */}
+                        {/* ✅ Details */}
                         <div style={{ width: "100%", marginTop: "8px", padding: "0 16px" }}>
                             <div style={{ marginBottom: "16px" }}>
-                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
+                                <p
+                                    style={{
+                                        fontSize: "0.625rem",
+                                        textTransform: "uppercase",
+                                        color: "#6b7280",
+                                    }}
+                                >
                                     Code
                                 </p>
-                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
+                                <p
+                                    style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}
+                                >
                                     T_{id.uuid}
                                 </p>
                             </div>
 
                             <div style={{ marginBottom: "16px" }}>
-                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
+                                <p
+                                    style={{
+                                        fontSize: "0.625rem",
+                                        textTransform: "uppercase",
+                                        color: "#6b7280",
+                                    }}
+                                >
                                     Valid From
                                 </p>
-                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
+                                <p
+                                    style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}
+                                >
                                     {validFrom}
                                 </p>
                             </div>
 
                             <div style={{ marginBottom: "16px" }}>
-                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
+                                <p
+                                    style={{
+                                        fontSize: "0.625rem",
+                                        textTransform: "uppercase",
+                                        color: "#6b7280",
+                                    }}
+                                >
                                     Valid Till
                                 </p>
-                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
+                                <p
+                                    style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}
+                                >
                                     {validTill}
                                 </p>
                             </div>
 
                             {id.bank_name?.length && (
                                 <div style={{ marginBottom: "16px" }}>
-                                    <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
+                                    <p
+                                        style={{
+                                            fontSize: "0.625rem",
+                                            textTransform: "uppercase",
+                                            color: "#6b7280",
+                                        }}
+                                    >
                                         Bank Name
                                     </p>
-                                    <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
+                                    <p
+                                        style={{
+                                            fontSize: "1rem",
+                                            fontWeight: 600,
+                                            color: "#1f2937",
+                                        }}
+                                    >
                                         {`${id.bank_name[0].bank_name} (${id.bank_name[0].bank_code})`}
                                     </p>
                                 </div>
@@ -266,10 +335,22 @@ const Card: React.FC = () => {
 
                             {id.branch_name?.length && (
                                 <div>
-                                    <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
+                                    <p
+                                        style={{
+                                            fontSize: "0.625rem",
+                                            textTransform: "uppercase",
+                                            color: "#6b7280",
+                                        }}
+                                    >
                                         Branch Name
                                     </p>
-                                    <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
+                                    <p
+                                        style={{
+                                            fontSize: "1rem",
+                                            fontWeight: 600,
+                                            color: "#1f2937",
+                                        }}
+                                    >
                                         {`${id.branch_name[0].branch_name} (${id.branch_name[0].branch_code})`}
                                     </p>
                                 </div>
@@ -277,7 +358,7 @@ const Card: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Download Button */}
+                    {/* ✅ Download Button */}
                     <button
                         onClick={downloadPDF}
                         style={{
@@ -296,13 +377,9 @@ const Card: React.FC = () => {
                             (e.currentTarget.style.backgroundColor = "#2563eb")
                         }
                     >
-                        Download Id
+                        Download ID
                     </button>
                 </div>
-
-
-
-
             ) : (
                 <div
                     style={{
@@ -315,7 +392,9 @@ const Card: React.FC = () => {
                         height: "100vh",
                     }}
                 >
-                    <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>
+                    <p
+                        style={{ fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}
+                    >
                         Not Permitted
                     </p>
                 </div>
