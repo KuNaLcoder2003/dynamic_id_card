@@ -2,8 +2,9 @@ import { Loader } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
-// @ts-ignore
-import domtoimage from 'dom-to-image';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 
 interface IdCard {
     uuid: string;
@@ -13,8 +14,8 @@ interface IdCard {
     user_avatar: string;
     bank_name?: any;
     branch_name?: any;
-    valid_from: string;
-    valid_till: string;
+    valid_from: "",
+    valid_till: "",
 }
 
 const Card: React.FC = () => {
@@ -24,7 +25,6 @@ const Card: React.FC = () => {
     const [permitted, setPermitted] = useState<boolean>(true);
     const [validTill, setValidTill] = useState("");
     const [validFrom, setValidFrom] = useState("");
-    const [logoBase64, setLogoBase64] = useState<string>("");
 
     const [id, setId] = useState<IdCard>({
         uuid: "",
@@ -35,8 +35,8 @@ const Card: React.FC = () => {
         bank_name: {},
         branch_name: {},
         valid_from: "",
-        valid_till: "",
-    });
+        valid_till: ""
+    })
 
     const downloadPDF = async () => {
         if (!cardRef.current) {
@@ -44,87 +44,72 @@ const Card: React.FC = () => {
             return;
         }
 
-        const node = cardRef.current;
+        const cardElement = cardRef.current;
 
-        domtoimage
-            .toPng(node, {
-                quality: 1,
-                bgcolor: "#ffffff",
-                cacheBust: true,
-                style: {
-                    transform: "scale(1)",
-                    transformOrigin: "top left",
-                },
-                width: node.offsetWidth * 1,
-                height: node.offsetHeight * 1,
-            })
-            .then((dataUrl: string) => {
-                const link = document.createElement("a");
-                link.download = `${id.name}_ID_CARD.png`;
-                link.href = dataUrl;
-                link.click();
-            })
-            .catch((error: any) => {
-                console.error("oops, something went wrong!", error);
-                toast.error("Failed to generate image");
-            });
+        // Wait for all images to load
+        const images = cardElement.querySelectorAll("img");
+        await Promise.all(
+            Array.from(images).map(
+                (img) =>
+                    new Promise<void>((resolve) => {
+                        if (img.complete) resolve();
+                        else img.onload = () => resolve();
+                        img.onerror = () => resolve();
+                    })
+            )
+        );
+
+        // Capture element as canvas
+        const canvas = await html2canvas(cardElement, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "px",
+            format: [canvas.width + 150, canvas.height + 10],
+        });
+
+        pdf.addImage(imgData, "PNG", 60, 60, canvas.width, canvas.height);
+        pdf.save(`${id.name}_ID_CARD.pdf`);
     };
-
-
-    useEffect(() => {
-        const convertLogoToBase64 = async () => {
-            try {
-                // Just use /logo.svg — this automatically refers to your public folder
-                const response = await fetch("/logo.svg");
-                const blob = await response.blob();
-                const reader = new FileReader();
-
-                reader.onloadend = () => {
-                    if (typeof reader.result === "string") {
-                        setLogoBase64(reader.result);
-                    }
-                };
-
-                reader.readAsDataURL(blob);
-            } catch (error) {
-                console.error("Failed to load logo:", error);
-            }
-        };
-
-        convertLogoToBase64();
-    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true);
-                const idParam = path.pathname.split("/").at(-1);
+                setLoading(true)
+                const idParam = path.pathname.split("/").at(-1)
                 const res = await fetch(
                     `https://sugee.io/KYCServiceAPI/kycapi/VerifyID/${idParam}`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                     }
-                );
-                const data = await res.json();
+                )
+                const data = await res.json()
                 if (data.valid) {
-                    setId(data.userId);
-                    setPermitted(true);
+                    setId(data.userId)
+                    setPermitted(true)
                     setValidFrom(data.valid_from);
                     setValidTill(data.valid_to);
                 } else {
-                    toast.error(data.message);
-                    setPermitted(false);
+                    toast.error(data.message)
+
+                    setPermitted(false)
                 }
             } catch (error) {
-                toast.error("Something went wrong");
+                toast.error("Something went wrong")
             } finally {
-                setLoading(false);
+                setLoading(false)
             }
-        };
+        }
 
-        fetchData();
-    }, [path.pathname]);
+        fetchData()
+    }, [path.pathname])
+
 
     return (
         <>
@@ -152,6 +137,7 @@ const Card: React.FC = () => {
                         marginTop: "40px",
                     }}
                 >
+                    {/* Card */}
                     <div
                         ref={cardRef}
                         style={{
@@ -163,31 +149,27 @@ const Card: React.FC = () => {
                             flexDirection: "column",
                             alignItems: "center",
                             padding: "24px",
+                            paddingBottom: "40px",
                             backgroundColor: "#ffffff",
                             fontFamily: "Inter, sans-serif",
                             color: "#1f2937",
                         }}
                     >
-                        {/* ✅ Logo (Base64) */}
+                        {/* Logo */}
                         <div style={{ width: "64px", height: "64px", marginBottom: "16px" }}>
-                            {logoBase64 ? (
-                                <img
-                                    src={logoBase64}
-                                    alt="Company Logo"
-                                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                                />
-                            ) : (
-                                <Loader className="animate-spin" style={{ width: "24px", height: "24px" }} />
-                            )}
+                            <img
+                                src="/logo.svg"
+                                alt="Company Logo"
+                                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                                crossOrigin="anonymous"
+                            />
                         </div>
 
                         {/* QR */}
-
-
                         <div
                             style={{
-                                width: "200px",
-                                height: "200px",
+                                width: "112px",
+                                height: "112px",
                                 borderRadius: "16px",
                                 overflow: "hidden",
                                 boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
@@ -205,7 +187,7 @@ const Card: React.FC = () => {
                             />
                         </div>
 
-
+                        {/* Name + Designation */}
                         <div style={{ marginTop: "16px", textAlign: "center" }}>
                             <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1f2937" }}>
                                 {id.name}
@@ -215,7 +197,7 @@ const Card: React.FC = () => {
                             </p>
                         </div>
 
-
+                        {/* Divider */}
                         <div
                             style={{
                                 width: "100%",
@@ -296,13 +278,9 @@ const Card: React.FC = () => {
                             (e.currentTarget.style.backgroundColor = "#2563eb")
                         }
                     >
-                        Download Id
+                        Download as PDF
                     </button>
                 </div>
-
-
-
-
             ) : (
                 <div
                     style={{
