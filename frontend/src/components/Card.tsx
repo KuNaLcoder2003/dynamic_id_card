@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Loader } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
-import rasterizeHTML from "rasterizehtml";
+import html2canvas from "html2canvas";
 
 interface IdCard {
     uuid: string;
@@ -37,6 +37,7 @@ const Card: React.FC = () => {
         valid_till: "",
     });
 
+    // Convert logo to Base64
     useEffect(() => {
         const convertLogoToBase64 = async () => {
             try {
@@ -54,6 +55,7 @@ const Card: React.FC = () => {
         convertLogoToBase64();
     }, []);
 
+    // Fetch ID data
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -82,23 +84,33 @@ const Card: React.FC = () => {
         fetchData();
     }, [path.pathname]);
 
+    // Download ID as image
     const downloadImage = async () => {
         if (!cardRef.current) return toast.error("Card not ready");
 
         try {
-            const htmlString = cardRef.current.outerHTML;
+            // Wait for all images to load
+            const images = cardRef.current.querySelectorAll("img");
+            await Promise.all(
+                Array.from(images).map(
+                    (img) =>
+                        new Promise<void>((resolve) => {
+                            if (img.complete) resolve();
+                            else {
+                                img.onload = () => resolve();
+                                img.onerror = () => resolve();
+                            }
+                        })
+                )
+            );
 
-            // Create a temporary canvas
-            const canvas = document.createElement("canvas");
-            canvas.width = cardRef.current.offsetWidth * 2; // scale for high-res
-            canvas.height = cardRef.current.offsetHeight * 2;
+            const canvas = await html2canvas(cardRef.current, {
+                scale: 2, // higher resolution
+                useCORS: true,
+                backgroundColor: "#ffffff",
+            });
 
-            // Draw HTML into the canvas
-            await rasterizeHTML.drawHTML(htmlString, canvas);
-
-            // Convert canvas to image
             const dataUrl = canvas.toDataURL("image/png");
-
             const link = document.createElement("a");
             link.href = dataUrl;
             link.download = `${id.name}_ID_CARD.png`;
@@ -142,14 +154,16 @@ const Card: React.FC = () => {
                             )}
                         </div>
 
-                        {/* QR */}
+                        {/* QR Code */}
                         <div style={{ width: 200, height: 200, borderRadius: 16, overflow: "hidden", border: "4px solid #e5e7eb", display: "flex", justifyContent: "center", alignItems: "center" }}>
                             <img src={id.qrCode} alt="QR Code" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                         </div>
 
+                        {/* Name */}
                         <h2 style={{ marginTop: 16, textAlign: "center", fontSize: "1.25rem", fontWeight: 700 }}>{id.name}</h2>
                         <p style={{ fontSize: "0.875rem", color: "#6b7280" }}>Field Consultant</p>
 
+                        {/* Divider */}
                         <div style={{ width: "100%", borderTop: "1px solid #d1d5db", margin: "16px 0" }} />
 
                         {/* Details */}
