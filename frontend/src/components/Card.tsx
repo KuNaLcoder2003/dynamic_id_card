@@ -151,10 +151,12 @@ const Card: React.FC = () => {
 
     return (
         <div
+            className="p-6"
             style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
+
                 marginTop: 40,
             }}
         >
