@@ -2,8 +2,8 @@ import { Loader } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
-// @ts-ignore
-import domtoimage from "dom-to-image";
+
+import * as htmlToImage from "html-to-image";
 
 interface IdCard {
     uuid: string;
@@ -20,13 +20,11 @@ interface IdCard {
 const Card: React.FC = () => {
     const cardRef = useRef<HTMLDivElement>(null);
     const path = useLocation();
-
     const [loading, setLoading] = useState<boolean>(true);
     const [permitted, setPermitted] = useState<boolean>(true);
     const [validTill, setValidTill] = useState("");
     const [validFrom, setValidFrom] = useState("");
     const [logoBase64, setLogoBase64] = useState<string>("");
-    const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
 
     const [id, setId] = useState<IdCard>({
         uuid: "",
@@ -40,44 +38,7 @@ const Card: React.FC = () => {
         valid_till: "",
     });
 
-    const downloadPDF = async () => {
-        if (!cardRef.current) {
-            toast.error("Card not ready");
-            return;
-        }
-
-        if (!imagesLoaded) {
-            toast.error("Please wait for images to load");
-            return;
-        }
-
-        const node = cardRef.current;
-
-        domtoimage
-            .toPng(node, {
-                quality: 1,
-                bgcolor: "#ffffff",
-                cacheBust: true,
-                useCORS: true,
-                width: node.offsetWidth,
-                height: node.offsetHeight,
-                style: {
-                    transform: "scale(1)",
-                    transformOrigin: "top left",
-                },
-            })
-            .then((dataUrl: string) => {
-                const link = document.createElement("a");
-                link.download = `${id.name}_ID_CARD.png`;
-                link.href = dataUrl;
-                link.click();
-            })
-            .catch((error: any) => {
-                console.error("oops, something went wrong!", error);
-                toast.error("Failed to generate image");
-            });
-    };
-
+    // Convert logo to base64
     useEffect(() => {
         const convertLogoToBase64 = async () => {
             try {
@@ -100,6 +61,7 @@ const Card: React.FC = () => {
         convertLogoToBase64();
     }, []);
 
+    // Fetch ID card data
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -107,10 +69,7 @@ const Card: React.FC = () => {
                 const idParam = path.pathname.split("/").at(-1);
                 const res = await fetch(
                     `https://sugee.io/KYCServiceAPI/kycapi/VerifyID/${idParam}`,
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                    }
+                    { method: "POST", headers: { "Content-Type": "application/json" } }
                 );
                 const data = await res.json();
                 if (data.valid) {
@@ -132,21 +91,29 @@ const Card: React.FC = () => {
         fetchData();
     }, [path.pathname]);
 
-    // ✅ Wait until both logo & QR images are loaded before allowing download
-    useEffect(() => {
-        if (logoBase64 && id.qrCode) {
-            const logoImg = new Image();
-            const qrImg = new Image();
-
-            logoImg.src = logoBase64;
-            qrImg.src = id.qrCode;
-
-            Promise.all([
-                new Promise((resolve) => (logoImg.onload = resolve)),
-                new Promise((resolve) => (qrImg.onload = resolve)),
-            ]).then(() => setImagesLoaded(true));
+    // Download card as image
+    const downloadImage = async () => {
+        if (!cardRef.current) {
+            toast.error("Card not ready");
+            return;
         }
-    }, [logoBase64, id.qrCode]);
+
+        try {
+            const dataUrl = await htmlToImage.toPng(cardRef.current, {
+                cacheBust: true,
+                backgroundColor: "#ffffff",
+                pixelRatio: 2, // improves mobile quality,
+            });
+
+            const link = document.createElement("a");
+            link.download = `${id.name}_ID_CARD.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (err) {
+            console.error("Image generation failed:", err);
+            toast.error("Failed to download image");
+        }
+    };
 
     return (
         <>
@@ -190,7 +157,7 @@ const Card: React.FC = () => {
                             color: "#1f2937",
                         }}
                     >
-                        {/* ✅ Logo */}
+                        {/* Logo */}
                         <div style={{ width: "64px", height: "64px", marginBottom: "16px" }}>
                             {logoBase64 ? (
                                 <img
@@ -199,14 +166,11 @@ const Card: React.FC = () => {
                                     style={{ width: "100%", height: "100%", objectFit: "contain" }}
                                 />
                             ) : (
-                                <Loader
-                                    className="animate-spin"
-                                    style={{ width: "24px", height: "24px" }}
-                                />
+                                <Loader className="animate-spin" style={{ width: "24px", height: "24px" }} />
                             )}
                         </div>
 
-                        {/* ✅ QR Code */}
+                        {/* QR Code */}
                         <div
                             style={{
                                 width: "200px",
@@ -224,31 +188,20 @@ const Card: React.FC = () => {
                                 src={id.qrCode}
                                 alt="QR Code"
                                 style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                                crossOrigin="anonymous"
                             />
                         </div>
 
+                        {/* Name */}
                         <div style={{ marginTop: "16px", textAlign: "center" }}>
-                            <h2
-                                style={{
-                                    fontSize: "1.25rem",
-                                    fontWeight: 700,
-                                    color: "#1f2937",
-                                }}
-                            >
+                            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1f2937" }}>
                                 {id.name}
                             </h2>
-                            <p
-                                style={{
-                                    fontSize: "0.875rem",
-                                    color: "#6b7280",
-                                    marginTop: "4px",
-                                }}
-                            >
+                            <p style={{ fontSize: "0.875rem", color: "#6b7280", marginTop: "4px" }}>
                                 Field Consultant
                             </p>
                         </div>
 
+                        {/* Divider */}
                         <div
                             style={{
                                 width: "100%",
@@ -257,77 +210,41 @@ const Card: React.FC = () => {
                             }}
                         ></div>
 
-                        {/* ✅ Details */}
+                        {/* Details */}
                         <div style={{ width: "100%", marginTop: "8px", padding: "0 16px" }}>
                             <div style={{ marginBottom: "16px" }}>
-                                <p
-                                    style={{
-                                        fontSize: "0.625rem",
-                                        textTransform: "uppercase",
-                                        color: "#6b7280",
-                                    }}
-                                >
+                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
                                     Code
                                 </p>
-                                <p
-                                    style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}
-                                >
+                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
                                     T_{id.uuid}
                                 </p>
                             </div>
 
                             <div style={{ marginBottom: "16px" }}>
-                                <p
-                                    style={{
-                                        fontSize: "0.625rem",
-                                        textTransform: "uppercase",
-                                        color: "#6b7280",
-                                    }}
-                                >
+                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
                                     Valid From
                                 </p>
-                                <p
-                                    style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}
-                                >
+                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
                                     {validFrom}
                                 </p>
                             </div>
 
                             <div style={{ marginBottom: "16px" }}>
-                                <p
-                                    style={{
-                                        fontSize: "0.625rem",
-                                        textTransform: "uppercase",
-                                        color: "#6b7280",
-                                    }}
-                                >
+                                <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
                                     Valid Till
                                 </p>
-                                <p
-                                    style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}
-                                >
+                                <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
                                     {validTill}
                                 </p>
                             </div>
 
                             {id.bank_name?.length && (
                                 <div style={{ marginBottom: "16px" }}>
-                                    <p
-                                        style={{
-                                            fontSize: "0.625rem",
-                                            textTransform: "uppercase",
-                                            color: "#6b7280",
-                                        }}
-                                    >
+                                    <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
                                         Bank Name
                                     </p>
-                                    <p
-                                        style={{
-                                            fontSize: "1rem",
-                                            fontWeight: 600,
-                                            color: "#1f2937",
-                                        }}
-                                    >
+                                    <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
                                         {`${id.bank_name[0].bank_name} (${id.bank_name[0].bank_code})`}
                                     </p>
                                 </div>
@@ -335,22 +252,10 @@ const Card: React.FC = () => {
 
                             {id.branch_name?.length && (
                                 <div>
-                                    <p
-                                        style={{
-                                            fontSize: "0.625rem",
-                                            textTransform: "uppercase",
-                                            color: "#6b7280",
-                                        }}
-                                    >
+                                    <p style={{ fontSize: "0.625rem", textTransform: "uppercase", color: "#6b7280" }}>
                                         Branch Name
                                     </p>
-                                    <p
-                                        style={{
-                                            fontSize: "1rem",
-                                            fontWeight: 600,
-                                            color: "#1f2937",
-                                        }}
-                                    >
+                                    <p style={{ fontSize: "1rem", fontWeight: 600, color: "#1f2937" }}>
                                         {`${id.branch_name[0].branch_name} (${id.branch_name[0].branch_code})`}
                                     </p>
                                 </div>
@@ -358,9 +263,9 @@ const Card: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* ✅ Download Button */}
+                    {/* Download Button */}
                     <button
-                        onClick={downloadPDF}
+                        onClick={downloadImage}
                         style={{
                             marginTop: "24px",
                             padding: "8px 24px",
@@ -370,12 +275,8 @@ const Card: React.FC = () => {
                             cursor: "pointer",
                             border: "none",
                         }}
-                        onMouseOver={(e) =>
-                            (e.currentTarget.style.backgroundColor = "#1d4ed8")
-                        }
-                        onMouseOut={(e) =>
-                            (e.currentTarget.style.backgroundColor = "#2563eb")
-                        }
+                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#1d4ed8")}
+                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#2563eb")}
                     >
                         Download ID
                     </button>
@@ -392,11 +293,7 @@ const Card: React.FC = () => {
                         height: "100vh",
                     }}
                 >
-                    <p
-                        style={{ fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}
-                    >
-                        Not Permitted
-                    </p>
+                    <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#1f2937" }}>Not Permitted</p>
                 </div>
             )}
         </>
