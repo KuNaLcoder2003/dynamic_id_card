@@ -2,7 +2,7 @@ import { Loader } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
-import html2canvas from "html2canvas";
+// import html2canvas from "html2canvas";
 
 interface IdCard {
     uuid: string;
@@ -23,9 +23,7 @@ const Card: React.FC = () => {
     const [permitted, setPermitted] = useState<boolean>(true);
     const [validTill, setValidTill] = useState("");
     const [validFrom, setValidFrom] = useState("");
-
-
-
+    const [logoBase64, setLogoBase64] = useState<string>("");
 
     const [id, setId] = useState<IdCard>({
         uuid: "",
@@ -40,7 +38,19 @@ const Card: React.FC = () => {
     });
 
     // Convert SVG logo to Base64
-
+    useEffect(() => {
+        const convertLogoToBase64 = async () => {
+            try {
+                const response = await fetch("/logo.svg");
+                const svgText = await response.text();
+                const base64 = `data:image/svg+xml;base64,${btoa(svgText)}`;
+                setLogoBase64(base64);
+            } catch (error) {
+                console.error("Failed to load logo:", error);
+            }
+        };
+        convertLogoToBase64();
+    }, []);
 
     // Fetch ID data
     useEffect(() => {
@@ -72,61 +82,48 @@ const Card: React.FC = () => {
     }, [path.pathname]);
 
     // Wait for all images to load
-    const waitForImages = async (node: HTMLElement) => {
-        const imgs = node.querySelectorAll("img");
-        await Promise.all(
-            Array.from(imgs).map(
-                (img) =>
-                    new Promise<void>((resolve) => {
-                        if (img.complete) resolve();
-                        else {
-                            img.onload = () => resolve();
-                            img.onerror = () => resolve();
-                        }
-                    })
-            )
-        );
-    };
+    // const waitForImages = async (node: HTMLElement) => {
+    //     const imgs = node.querySelectorAll("img");
+    //     await Promise.all(
+    //         Array.from(imgs).map(
+    //             (img) =>
+    //                 new Promise<void>((resolve) => {
+    //                     if (img.complete) resolve();
+    //                     else {
+    //                         img.onload = () => resolve();
+    //                         img.onerror = () => resolve();
+    //                     }
+    //                 })
+    //         )
+    //     );
+    // };
 
-    // Download card as image
-    const downloadImage = async () => {
-        if (!cardRef.current) {
-            toast.error("Card not ready");
-            return;
-        }
-        const node = cardRef.current;
-        try {
-            await waitForImages(node);
+    // // Download card as image
+    // const downloadImage = async () => {
+    //     if (!cardRef.current) {
+    //         toast.error("Card not ready");
+    //         return;
+    //     }
+    //     const node = cardRef.current;
+    //     try {
+    //         await waitForImages(node);
 
-            const canvas = await html2canvas(node, {
-                scale: Math.min(window.devicePixelRatio, 2),
-                useCORS: true,
-                backgroundColor: "#ffffff",
-                scrollX: 0,
-                scrollY: -window.scrollY,
-            });
+    //         const canvas = await html2canvas(node, {
+    //             scale: window.devicePixelRatio * 1, // handle mobile DPI
+    //             useCORS: true,
+    //             backgroundColor: "#ffffff",
+    //         });
 
-            const dataUrl = canvas.toDataURL("image/png");
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-            if (isSafari) {
-                const newTab = window.open();
-                newTab?.document.write(`<img src="${dataUrl}" alt="ID Card"/>`);
-                toast("Long-press the image and select 'Save Image' to download.", { icon: "📱" });
-            } else {
-                const link = document.createElement("a");
-                link.href = dataUrl;
-                link.download = `${id.name}_ID_CARD.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        } catch (error) {
-            console.error("Failed to generate image:", error);
-            toast.error("Failed to generate image");
-        }
-    };
-    ;
+    //         const dataUrl = canvas.toDataURL("image/png");
+    //         const link = document.createElement("a");
+    //         link.href = dataUrl;
+    //         link.download = `${id.name}_ID_CARD.png`;
+    //         link.click();
+    //     } catch (error) {
+    //         console.error("Failed to generate image:", error);
+    //         toast.error("Failed to generate image");
+    //     }
+    // };
 
     if (loading) {
         return (
@@ -164,21 +161,18 @@ const Card: React.FC = () => {
 
     return (
         <div
-            className="p-6"
             style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-
                 marginTop: 40,
             }}
         >
             <div
-                className="p-4"
                 ref={cardRef}
                 style={{
-                    width: 450,
-                    height: 700,
+                    width: 400,
+                    height: 560,
                     borderRadius: 16,
                     boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
                     display: "flex",
@@ -191,8 +185,21 @@ const Card: React.FC = () => {
                 }}
             >
                 {/* Logo */}
-                <div className="m-auto p-4" style={{ width: "50%", height: 64, marginBottom: 16, backgroundImage: `url(/logo.svg)`, backgroundRepeat: "no-repeat", backgroundPositionX: "50%" }}>
-
+                <div style={{ width: 80, height: 64, marginBottom: 16 }}>
+                    {logoBase64 ? (
+                        <img
+                            src={logoBase64}
+                            alt="Company Logo"
+                            style={{
+                                width: "auto",
+                                height: "100%",
+                                objectFit: "contain",
+                                display: "block",
+                            }}
+                        />
+                    ) : (
+                        <Loader className="animate-spin" style={{ width: 24, height: 24 }} />
+                    )}
                 </div>
 
                 {/* QR Code */}
@@ -261,16 +268,33 @@ const Card: React.FC = () => {
                     </div>
                     <div style={{ marginBottom: 16 }}>
                         <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
-                            Branch
+                            Valid Till
                         </p>
                         <p style={{ fontSize: 16, fontWeight: 600 }}>{id.branch_name.branch_name}</p>
                     </div>
                 </div>
             </div>
 
-            {/* Download Button */}
             <button
+
+                disabled={true}
+                style={{
+                    marginTop: 24,
+                    padding: "8px 24px",
+                    backgroundColor: "#2563eb",
+                    color: "#fff",
+                    borderRadius: 8,
+                    border: "none",
+                    cursor: "pointer",
+                }}
+            >
+                Please take a screenshot
+            </button>
+
+            {/* Download Button */}
+            {/* <button
                 onClick={downloadImage}
+                disabled={true}
                 style={{
                     marginTop: 24,
                     padding: "8px 24px",
@@ -282,7 +306,7 @@ const Card: React.FC = () => {
                 }}
             >
                 Download ID
-            </button>
+            </button> */}
         </div>
     );
 };
