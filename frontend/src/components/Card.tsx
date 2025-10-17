@@ -99,21 +99,34 @@ const Card: React.FC = () => {
             await waitForImages(node);
 
             const canvas = await html2canvas(node, {
-                scale: window.devicePixelRatio * 1, // handle mobile DPI
+                scale: Math.min(window.devicePixelRatio, 2),
                 useCORS: true,
                 backgroundColor: "#ffffff",
+                scrollX: 0,
+                scrollY: -window.scrollY,
             });
 
             const dataUrl = canvas.toDataURL("image/png");
-            const link = document.createElement("a");
-            link.href = dataUrl;
-            link.download = `${id.name}_ID_CARD.png`;
-            link.click();
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+            if (isSafari) {
+                const newTab = window.open();
+                newTab?.document.write(`<img src="${dataUrl}" alt="ID Card"/>`);
+                toast("Long-press the image and select 'Save Image' to download.", { icon: "📱" });
+            } else {
+                const link = document.createElement("a");
+                link.href = dataUrl;
+                link.download = `${id.name}_ID_CARD.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         } catch (error) {
             console.error("Failed to generate image:", error);
             toast.error("Failed to generate image");
         }
     };
+    ;
 
     if (loading) {
         return (
