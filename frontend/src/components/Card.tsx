@@ -2,7 +2,6 @@ import { Loader } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
-// import html2canvas from "html2canvas";
 
 interface IdCard {
     uuid: string;
@@ -23,7 +22,6 @@ const Card: React.FC = () => {
     const [permitted, setPermitted] = useState<boolean>(true);
     const [validTill, setValidTill] = useState("");
     const [validFrom, setValidFrom] = useState("");
-    const [logoBase64, setLogoBase64] = useState<string>("");
 
     const [id, setId] = useState<IdCard>({
         uuid: "",
@@ -37,22 +35,6 @@ const Card: React.FC = () => {
         valid_till: "",
     });
 
-    // Convert SVG logo to Base64
-    useEffect(() => {
-        const convertLogoToBase64 = async () => {
-            try {
-                const response = await fetch("/logo.svg");
-                const svgText = await response.text();
-                const base64 = `data:image/svg+xml;base64,${btoa(svgText)}`;
-                setLogoBase64(base64);
-            } catch (error) {
-                console.error("Failed to load logo:", error);
-            }
-        };
-        convertLogoToBase64();
-    }, []);
-
-    // Fetch ID data
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -80,50 +62,6 @@ const Card: React.FC = () => {
         };
         fetchData();
     }, [path.pathname]);
-
-    // Wait for all images to load
-    // const waitForImages = async (node: HTMLElement) => {
-    //     const imgs = node.querySelectorAll("img");
-    //     await Promise.all(
-    //         Array.from(imgs).map(
-    //             (img) =>
-    //                 new Promise<void>((resolve) => {
-    //                     if (img.complete) resolve();
-    //                     else {
-    //                         img.onload = () => resolve();
-    //                         img.onerror = () => resolve();
-    //                     }
-    //                 })
-    //         )
-    //     );
-    // };
-
-    // // Download card as image
-    // const downloadImage = async () => {
-    //     if (!cardRef.current) {
-    //         toast.error("Card not ready");
-    //         return;
-    //     }
-    //     const node = cardRef.current;
-    //     try {
-    //         await waitForImages(node);
-
-    //         const canvas = await html2canvas(node, {
-    //             scale: window.devicePixelRatio * 1, // handle mobile DPI
-    //             useCORS: true,
-    //             backgroundColor: "#ffffff",
-    //         });
-
-    //         const dataUrl = canvas.toDataURL("image/png");
-    //         const link = document.createElement("a");
-    //         link.href = dataUrl;
-    //         link.download = `${id.name}_ID_CARD.png`;
-    //         link.click();
-    //     } catch (error) {
-    //         console.error("Failed to generate image:", error);
-    //         toast.error("Failed to generate image");
-    //     }
-    // };
 
     if (loading) {
         return (
@@ -172,9 +110,9 @@ const Card: React.FC = () => {
                 ref={cardRef}
                 style={{
                     width: 400,
-                    height: 560,
-                    borderRadius: 16,
-                    boxShadow: "0 10px 15px rgba(0,0,0,0.1)",
+                    height: 620,
+                    borderRadius: 20,
+                    boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -182,31 +120,34 @@ const Card: React.FC = () => {
                     backgroundColor: "#ffffff",
                     fontFamily: "Inter, sans-serif",
                     color: "#1f2937",
+                    position: "relative",
                 }}
             >
                 {/* Logo */}
-                <div style={{ width: 80, height: 64, marginBottom: 16 }}>
-                    {logoBase64 ? (
-                        <img
-                            src={logoBase64}
-                            alt="Company Logo"
-                            style={{
-                                width: "auto",
-                                height: "100%",
-                                objectFit: "contain",
-                                display: "block",
-                            }}
-                        />
-                    ) : (
-                        <Loader className="animate-spin" style={{ width: 24, height: 24 }} />
-                    )}
+                <div style={{ width: 90, height: 70, marginBottom: 8 }}>
+                    <img
+                        src="https://sugee.io/ckyc/assets/img/logo-text-primary.svg"
+                        alt="Company Logo"
+                        style={{
+                            width: "auto",
+                            height: "100%",
+                            objectFit: "contain",
+                            display: "block",
+                        }}
+                    />
                 </div>
+
+                {/* User Avatar or Default Icon */}
+
+
+                <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" width="60px" height="60px" className="rounded-full my-2" />
+
 
                 {/* QR Code */}
                 <div
                     style={{
-                        width: 200,
-                        height: 200,
+                        width: 230,
+                        height: 230,
                         borderRadius: 16,
                         overflow: "hidden",
                         boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
@@ -214,6 +155,7 @@ const Card: React.FC = () => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
+                        backgroundColor: "#fff",
                     }}
                 >
                     <img
@@ -225,7 +167,7 @@ const Card: React.FC = () => {
                 </div>
 
                 {/* Name */}
-                <div style={{ marginTop: 16, textAlign: "center" }}>
+                <div style={{ marginTop: 20, textAlign: "center" }}>
                     <h2 style={{ fontSize: "1.25rem", fontWeight: 700 }}>{id.name}</h2>
                     <p style={{ fontSize: "0.875rem", color: "#6b7280", marginTop: 4 }}>
                         Field Consultant
@@ -242,41 +184,44 @@ const Card: React.FC = () => {
 
                 {/* Details */}
                 <div style={{ width: "100%", marginTop: 8, padding: "0 16px" }}>
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 10 }}>
                         <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
                             Code
                         </p>
                         <p style={{ fontSize: 16, fontWeight: 600 }}>T_{id.uuid}</p>
                     </div>
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 10 }}>
                         <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
                             Valid From
                         </p>
                         <p style={{ fontSize: 16, fontWeight: 600 }}>{validFrom}</p>
                     </div>
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 10 }}>
                         <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
                             Valid Till
                         </p>
                         <p style={{ fontSize: 16, fontWeight: 600 }}>{validTill}</p>
                     </div>
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ marginBottom: 10 }}>
                         <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
                             Bank
                         </p>
-                        <p style={{ fontSize: 16, fontWeight: 600 }}>{id.bank_name[0].bank_name}</p>
-                    </div>
-                    <div style={{ marginBottom: 16 }}>
-                        <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
-                            Valid Till
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>
+                            {id.bank_name?.[0]?.bank_name || "N/A"}
                         </p>
-                        <p style={{ fontSize: 16, fontWeight: 600 }}>{id.branch_name.branch_name}</p>
+                    </div>
+                    <div style={{ marginBottom: 10 }}>
+                        <p style={{ fontSize: 10, textTransform: "uppercase", color: "#6b7280" }}>
+                            Branch
+                        </p>
+                        <p style={{ fontSize: 16, fontWeight: 600 }}>
+                            {id.branch_name?.branch_name || "N/A"}
+                        </p>
                     </div>
                 </div>
             </div>
 
             <button
-
                 disabled={true}
                 style={{
                     marginTop: 24,
@@ -290,23 +235,6 @@ const Card: React.FC = () => {
             >
                 Please take a screenshot
             </button>
-
-            {/* Download Button */}
-            {/* <button
-                onClick={downloadImage}
-                disabled={true}
-                style={{
-                    marginTop: 24,
-                    padding: "8px 24px",
-                    backgroundColor: "#2563eb",
-                    color: "#fff",
-                    borderRadius: 8,
-                    border: "none",
-                    cursor: "pointer",
-                }}
-            >
-                Download ID
-            </button> */}
         </div>
     );
 };
