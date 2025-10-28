@@ -7,8 +7,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<GetIdCard />} />
-      <Route path="/SugeeIDCard/verify/:dynamicId" element={<Verify />} />
-      <Route path="/SugeeIDCard/card/:dynamicId" element={<Card />} />
+      <Route path="/verify/:dynamicId" element={<Verify />} />
+      <Route path="/card/:dynamicId" element={<Card />} />
     </Routes>
   )
 }
