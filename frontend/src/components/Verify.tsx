@@ -14,6 +14,7 @@ interface IdCard {
 
 const Verify: React.FC = () => {
     const path = useLocation();
+
     const userId = path.pathname.split("/").at(-1);
     const [loading, setLoading] = useState<boolean>(false);
     const [verified, setVerified] = useState<boolean>(false);
@@ -26,6 +27,8 @@ const Verify: React.FC = () => {
         bank_name: [],
         branch_name: {}
     });
+
+
 
     const handleVerify = async () => {
         if (!userId) {
